@@ -5,14 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "notificaciones")
+@Table(name = "plan_alimentacion")
 @Data
 @NoArgsConstructor
-public class Notificacion {
+public class PlanAlimentacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // TODO: (Ashly) Agregar mensaje, fecha, estado leido/no leido
+    // TODO: Completar campos (caballo_id, descripcion, cantidad, horario)
 }

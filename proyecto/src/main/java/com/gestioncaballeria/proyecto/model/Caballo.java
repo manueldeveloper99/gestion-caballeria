@@ -3,11 +3,10 @@ package com.gestioncaballeria.proyecto.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
+import java.math.BigDecimal;
 
 @Entity
-@Table(name = "caballos")
+@Table(name = "caballo")
 @Data
 @NoArgsConstructor
 public class Caballo {
@@ -16,20 +15,23 @@ public class Caballo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String nombre;
-
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 50)
     private String identificador;
 
+    @Column(nullable = false, length = 100)
+    private String nombre;
+
     private Integer edad;
+
+    @Column(length = 100)
     private String raza;
+
+    @Column(length = 20)
     private String sexo;
-    private Double peso;
 
-    @Column(name = "foto_url")
-    private String fotoUrl;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal peso;
 
-    @OneToMany(mappedBy = "caballo", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<HistorialMedico> historialesMedicos;
+    @Column(length = 255)
+    private String foto;
 }

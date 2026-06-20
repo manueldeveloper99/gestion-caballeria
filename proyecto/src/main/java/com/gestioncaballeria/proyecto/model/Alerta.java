@@ -5,15 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "alimentaciones")
+@Table(name = "alerta")
 @Data
 @NoArgsConstructor
-public class Alimentacion {
+public class Alerta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // TODO: (Carol) Agregar campos como fecha, tipo, cantidad
-    // TODO: (Carol) Relacionar con Caballo
+    // TODO: Completar campos (inventario_id, mensaje, fecha, tipo)
 }

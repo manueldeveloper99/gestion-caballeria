@@ -1,15 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
 
 :root {
-  --primary: #1A362D; /* Dark rich green */
-  --primary-light: #2c594c;
-  --secondary: #D4AF37; /* Metallic Gold */
-  --secondary-light: #f3e5ab;
-  --bg-color: #fcfcfc;
-  --text-color: #1a1a1a;
-  --text-muted: #666666;
+  --primary: #542c18; /* Dark chocolate brown */
+  --primary-light: #703E24; /* Lighter brown for hovers */
+  --secondary: #8A4C29; /* Accent brown */
+  --secondary-light: #E6D5CB;
+  --bg-color: #FFFFFF; /* Pure white background */
+  --text-color: #333333;
+  --text-muted: #888888;
   --white: #ffffff;
-  --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
   --border-radius: 8px;
 }
 
@@ -61,12 +61,13 @@ a:hover {
   padding: 30px 20px;
   display: flex;
   flex-direction: column;
+  border-right: none;
 }
 
 .sidebar-logo {
   font-family: 'Playfair Display', serif;
   font-size: 24px;
-  color: var(--secondary);
+  color: var(--white);
   margin-bottom: 40px;
   text-align: center;
   letter-spacing: 1px;
@@ -79,11 +80,13 @@ a:hover {
   border-radius: var(--border-radius);
   transition: all 0.3s ease;
   display: block;
+  font-weight: 500;
 }
 
 .nav-link:hover, .nav-link.active {
   background-color: var(--primary-light);
-  color: var(--secondary);
+  color: var(--white);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .main-content {
@@ -114,13 +117,14 @@ a:hover {
 }
 
 .btn-primary {
-  background-color: var(--secondary);
-  color: var(--primary);
+  background-color: var(--primary);
+  color: var(--white);
 }
 
 .btn-primary:hover {
-  background-color: #c5a030;
+  background-color: var(--secondary);
   transform: translateY(-2px);
+  color: var(--white);
 }
 
 .page-header {

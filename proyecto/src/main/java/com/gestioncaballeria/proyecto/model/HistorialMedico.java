@@ -1,14 +1,12 @@
 package com.gestioncaballeria.proyecto.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "historiales_medicos")
+@Table(name = "historial_medico")
 @Data
 @NoArgsConstructor
 public class HistorialMedico {
@@ -17,19 +15,26 @@ public class HistorialMedico {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "caballo_id", nullable = false)
+    private Caballo caballo;
+
+    @ManyToOne
+    @JoinColumn(name = "empleado_id", nullable = false)
+    private Empleado empleado;
+
     @Column(nullable = false)
     private LocalDate fecha;
 
-    @Column(nullable = false)
-    private String responsable;
+    @Column(length = 150)
+    private String vacuna;
 
-    private String vacunas;
-    private String tratamientos;
+    @Column(length = 255)
+    private String tratamiento;
+
+    @Column(length = 255)
     private String alergias;
-    private String observaciones;
 
-    @ManyToOne
-    @JoinColumn(name = "caballo_id", nullable = false)
-    @JsonIgnore
-    private Caballo caballo;
+    @Column(columnDefinition = "TEXT")
+    private String observaciones;
 }

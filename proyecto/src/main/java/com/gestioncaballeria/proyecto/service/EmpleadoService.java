@@ -1,9 +1,11 @@
 package com.gestioncaballeria.proyecto.service;
 
 import com.gestioncaballeria.proyecto.model.Empleado;
-import com.gestioncaballeria.proyecto.model.TurnoTarea;
+import com.gestioncaballeria.proyecto.model.Turno;
+import com.gestioncaballeria.proyecto.model.Tarea;
 import com.gestioncaballeria.proyecto.repository.EmpleadoRepository;
-import com.gestioncaballeria.proyecto.repository.TurnoTareaRepository;
+import com.gestioncaballeria.proyecto.repository.TurnoRepository;
+import com.gestioncaballeria.proyecto.repository.TareaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +19,10 @@ public class EmpleadoService {
     private EmpleadoRepository empleadoRepository;
 
     @Autowired
-    private TurnoTareaRepository turnoTareaRepository;
+    private TurnoRepository turnoRepository;
+
+    @Autowired
+    private TareaRepository tareaRepository;
 
     public List<Empleado> findAll() {
         return empleadoRepository.findAll();
@@ -35,12 +40,20 @@ public class EmpleadoService {
         empleadoRepository.deleteById(id);
     }
 
-    public TurnoTarea addTurnoTarea(Long empleadoId, TurnoTarea turnoTarea) {
+    public Turno addTurno(Long empleadoId, Turno turno) {
         Optional<Empleado> empleadoOpt = empleadoRepository.findById(empleadoId);
         if (empleadoOpt.isPresent()) {
-            Empleado empleado = empleadoOpt.get();
-            turnoTarea.setEmpleado(empleado);
-            return turnoTareaRepository.save(turnoTarea);
+            turno.setEmpleado(empleadoOpt.get());
+            return turnoRepository.save(turno);
+        }
+        throw new RuntimeException("Empleado no encontrado");
+    }
+
+    public Tarea addTarea(Long empleadoId, Tarea tarea) {
+        Optional<Empleado> empleadoOpt = empleadoRepository.findById(empleadoId);
+        if (empleadoOpt.isPresent()) {
+            tarea.setEmpleado(empleadoOpt.get());
+            return tareaRepository.save(tarea);
         }
         throw new RuntimeException("Empleado no encontrado");
     }

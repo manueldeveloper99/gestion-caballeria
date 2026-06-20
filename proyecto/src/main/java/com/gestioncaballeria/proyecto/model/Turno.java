@@ -3,28 +3,25 @@ package com.gestioncaballeria.proyecto.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "turnos_tareas")
+@Table(name = "turno")
 @Data
 @NoArgsConstructor
-public class TurnoTarea {
+public class Turno {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String descripcion;
-
-    @Column(nullable = false)
-    private LocalDateTime fechaInicio;
-
-    @Column(nullable = false)
-    private LocalDateTime fechaFin;
-
     @ManyToOne
     @JoinColumn(name = "empleado_id", nullable = false)
     private Empleado empleado;
+
+    @Column(nullable = false)
+    private LocalDate fecha;
+
+    @Column(length = 50)
+    private String horario;
 }

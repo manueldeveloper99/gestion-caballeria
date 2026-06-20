@@ -1,7 +1,8 @@
 package com.gestioncaballeria.proyecto.controller;
 
 import com.gestioncaballeria.proyecto.model.Empleado;
-import com.gestioncaballeria.proyecto.model.TurnoTarea;
+import com.gestioncaballeria.proyecto.model.Turno;
+import com.gestioncaballeria.proyecto.model.Tarea;
 import com.gestioncaballeria.proyecto.service.EmpleadoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -54,9 +55,18 @@ public class EmpleadoController {
     }
 
     @PostMapping("/{id}/turnos")
-    public ResponseEntity<TurnoTarea> addTurnoTarea(@PathVariable Long id, @RequestBody TurnoTarea turnoTarea) {
+    public ResponseEntity<Turno> addTurno(@PathVariable Long id, @RequestBody Turno turno) {
         try {
-            return ResponseEntity.ok(empleadoService.addTurnoTarea(id, turnoTarea));
+            return ResponseEntity.ok(empleadoService.addTurno(id, turno));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/{id}/tareas")
+    public ResponseEntity<Tarea> addTarea(@PathVariable Long id, @RequestBody Tarea tarea) {
+        try {
+            return ResponseEntity.ok(empleadoService.addTarea(id, tarea));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }

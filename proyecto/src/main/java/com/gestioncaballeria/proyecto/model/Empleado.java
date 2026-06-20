@@ -5,25 +5,29 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "empleados")
+@Table(name = "empleado")
 @Data
 @NoArgsConstructor
 public class Empleado {
-
-    public enum RolEmpleado {
-        VETERINARIO, POTRADOR, CUIDADOR, ADMINISTRADOR
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String nombre;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RolEmpleado rol;
 
+    @Column(length = 100)
     private String contacto;
+
+    public enum RolEmpleado {
+        VETERINARIO,
+        POTRADOR,
+        CUIDADOR,
+        ADMINISTRADOR
+    }
 }

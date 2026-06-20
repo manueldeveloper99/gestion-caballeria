@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuario")
 @Data
 @NoArgsConstructor
 public class Usuario {
@@ -14,5 +14,5 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // TODO: (Carol) Agregar username, password, roles
+    // TODO: Completar campos (empleado_id, correo, password, rol)
 }
