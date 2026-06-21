@@ -10,6 +10,7 @@ import PersonalDashboard from './pages/PersonalDashboard';
 import InventarioDashboard from './pages/InventarioDashboard';
 import CalendarioCitas from './pages/CalendarioCitas';
 import CaballerizasDashboard from './pages/CaballerizasDashboard';
+import Dashboard from './pages/Dashboard';
 function App() {
   return (
     <BrowserRouter>
@@ -21,19 +22,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route
             index
-            element={
-              <div>
-                <h1 className="page-header">
-                  Bienvenido al Sistema de Gestión
-                </h1>
-
-                <div className="card">
-                  <p>
-                    Seleccione un módulo en el menú lateral para comenzar.
-                  </p>
-                </div>
-              </div>
-            }
+            element={<Dashboard />}
           />
 
           <Route path="caballos" element={<CaballosDashboard />} />

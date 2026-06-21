@@ -103,7 +103,19 @@ const CalendarioCitas = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      const newData = { ...prev, [name]: value };
+      if (name === 'fechaInicio' && value) {
+        const newStartDate = value.split('T')[0];
+        if (prev.fechaFin) {
+          const oldEndTime = prev.fechaFin.split('T')[1] || '00:00';
+          newData.fechaFin = `${newStartDate}T${oldEndTime}`;
+        } else {
+          newData.fechaFin = value;
+        }
+      }
+      return newData;
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -173,7 +185,7 @@ const CalendarioCitas = () => {
   return (
     <div>
       <div className="page-header">
-        <h1>Calendario de Paseos y Citas</h1>
+        <h1>Calendario de {isCliente ? 'Reservas' : 'Paseos y Citas'}</h1>
       </div>
 
       <div className="card" style={{ height: '70vh' }}>
@@ -218,9 +230,13 @@ const CalendarioCitas = () => {
                   required
                 >
                   <option value="Paseo">Paseo</option>
-                  <option value="Revisión Médica">Revisión Médica</option>
-                  <option value="Entrenamiento">Entrenamiento</option>
-                  <option value="Mantenimiento">Mantenimiento / Limpieza</option>
+                  {!isCliente && (
+                    <>
+                      <option value="Revisión Médica">Revisión Médica</option>
+                      <option value="Entrenamiento">Entrenamiento</option>
+                      <option value="Mantenimiento">Mantenimiento / Limpieza</option>
+                    </>
+                  )}
                 </select>
               </div>
 
