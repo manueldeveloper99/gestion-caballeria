@@ -14,6 +14,7 @@ const Layout = () => {
           <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>Dashboard</Link>
           <Link to="/caballos" className={`nav-link ${location.pathname.includes('/caballos') ? 'active' : ''}`}>Caballos</Link>
           <Link to="/personal" className={`nav-link ${location.pathname.includes('/personal') ? 'active' : ''}`}>Personal</Link>
+          <Link to="/inventario" className={`nav-link ${location.pathname.includes('/inventario') ? 'active' : ''}`}>Inventario</Link>
         </nav>
       </aside>
       <main className="main-content">
