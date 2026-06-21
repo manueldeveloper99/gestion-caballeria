@@ -57,4 +57,11 @@ public class EmpleadoService {
         }
         throw new RuntimeException("Empleado no encontrado");
     }
+    public List<Turno> getTurnos(Long empleadoId) {
+        return turnoRepository.findByEmpleadoId(empleadoId);
+    }
+
+    public List<Tarea> getTareas(Long empleadoId) {
+        return tareaRepository.findByEmpleadoId(empleadoId);
+    }
 }
