@@ -42,6 +42,23 @@ const Dashboard = () => {
     return unsplashHorses[nombre.length % unsplashHorses.length];
   };
 
+  const rol = localStorage.getItem('rol') || '';
+
+  if (rol !== 'CLIENTE') {
+    return (
+      <div>
+        <h1 className="page-header">
+          Bienvenido al Sistema de Gestión
+        </h1>
+        <div className="card">
+          <p>
+            Seleccione un módulo en el menú lateral para comenzar.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1 className="page-header">
