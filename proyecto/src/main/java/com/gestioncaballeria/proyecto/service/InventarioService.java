@@ -11,22 +11,34 @@ import java.util.Optional;
 @Service
 public class InventarioService {
 
-    @Autowired
-    private InventarioRepository inventarioRepository;
 
-    public List<Inventario> findAll() {
-        return inventarioRepository.findAll();
-    }
+@Autowired
+private InventarioRepository inventarioRepository;
 
-    public Optional<Inventario> findById(Long id) {
-        return inventarioRepository.findById(id);
-    }
+@Autowired
+private AlertaService alertaService;
 
-    public Inventario save(Inventario inventario) {
-        return inventarioRepository.save(inventario);
-    }
+public List<Inventario> findAll() {
+    return inventarioRepository.findAll();
+}
 
-    public void deleteById(Long id) {
-        inventarioRepository.deleteById(id);
-    }
+public Optional<Inventario> findById(Long id) {
+    return inventarioRepository.findById(id);
+}
+
+public Inventario save(Inventario inventario) {
+
+    Inventario guardado =
+            inventarioRepository.save(inventario);
+
+    alertaService.verificarStock(guardado);
+
+    return guardado;
+}
+
+public void deleteById(Long id) {
+    inventarioRepository.deleteById(id);
+}
+
+
 }
