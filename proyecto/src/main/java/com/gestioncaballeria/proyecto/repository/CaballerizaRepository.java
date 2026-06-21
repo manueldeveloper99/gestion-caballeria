@@ -1,12 +1,12 @@
 package com.gestioncaballeria.proyecto.repository;
 
-import com.gestioncaballeria.proyecto.model.Usuario;
+import com.gestioncaballeria.proyecto.model.Caballeriza;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
-    Optional<Usuario> findByCorreo(String correo);
+public interface CaballerizaRepository extends JpaRepository<Caballeriza, Long> {
+    Optional<Caballeriza> findByNumero(String numero);
 }

@@ -39,7 +39,7 @@ public class CaballoController {
         return caballoService.findById(id).map(caballo -> {
             caballo.setNombre(caballoDetails.getNombre());
             caballo.setIdentificador(caballoDetails.getIdentificador());
-            caballo.setEdad(caballoDetails.getEdad());
+            caballo.setFechaNacimiento(caballoDetails.getFechaNacimiento());
             caballo.setRaza(caballoDetails.getRaza());
             caballo.setSexo(caballoDetails.getSexo());
             caballo.setPeso(caballoDetails.getPeso());

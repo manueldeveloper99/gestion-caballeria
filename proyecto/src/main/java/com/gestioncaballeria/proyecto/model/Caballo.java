@@ -3,6 +3,7 @@ package com.gestioncaballeria.proyecto.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.LocalDate;
 import java.math.BigDecimal;
 
 @Entity
@@ -21,7 +22,7 @@ public class Caballo {
     @Column(nullable = false, length = 100)
     private String nombre;
 
-    private Integer edad;
+    private LocalDate fechaNacimiento;
 
     @Column(length = 100)
     private String raza;
