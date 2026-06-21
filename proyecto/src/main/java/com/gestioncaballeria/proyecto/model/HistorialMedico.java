@@ -32,6 +32,8 @@ public class HistorialMedico {
     @Column(length = 255)
     private String tratamiento;
 
+    private Double pesoRegistrado;
+
     @Column(length = 255)
     private String alergias;
 

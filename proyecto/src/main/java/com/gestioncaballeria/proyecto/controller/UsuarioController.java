@@ -6,10 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/usuarios")
 @CrossOrigin("*")
 public class UsuarioController {
 
@@ -23,7 +24,6 @@ public class UsuarioController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Usuario usuario) {
-
         Optional<Usuario> usuarioLogueado =
                 usuarioService.login(
                         usuario.getCorreo(),
@@ -36,5 +36,15 @@ public class UsuarioController {
 
         return ResponseEntity.badRequest()
                 .body("Correo o contraseña incorrectos");
+    }
+
+    @GetMapping
+    public List<Usuario> getAllUsuarios() {
+        return usuarioService.findAll();
+    }
+
+    @PostMapping
+    public Usuario createUsuario(@RequestBody Usuario usuario) {
+        return usuarioService.save(usuario);
     }
 }

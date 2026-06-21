@@ -5,12 +5,13 @@ const CaballosDashboard = () => {
   const [caballos, setCaballos] = useState([]);
   const [empleados, setEmpleados] = useState([]);
   const [loading, setLoading] = useState(true);
+  const rol = localStorage.getItem('rol');
   
   // States for Caballo Modal
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
-    nombre: '', identificador: '', raza: '', edad: '', sexo: '', peso: '', foto: ''
+    nombre: '', identificador: '', raza: '', fechaNacimiento: '', sexo: '', peso: '', foto: ''
   });
 
   // States for Historial Modal
@@ -18,7 +19,16 @@ const CaballosDashboard = () => {
   const [selectedCaballo, setSelectedCaballo] = useState(null);
   const [historial, setHistorial] = useState([]);
   const [historialForm, setHistorialForm] = useState({
-    fecha: '', vacuna: '', tratamiento: '', alergias: '', observaciones: '', empleadoId: ''
+    fecha: '', vacuna: '', tratamiento: '', alergias: '', observaciones: '', empleadoId: '', pesoRegistrado: ''
+  });
+
+  // State for Tabs inside Ficha Veterinaria
+  const [activeTab, setActiveTab] = useState('medico'); // 'medico' | 'alimentacion'
+
+  // States for Plan Alimentacion
+  const [planAlimentacion, setPlanAlimentacion] = useState([]);
+  const [alimentacionForm, setAlimentacionForm] = useState({
+    descripcion: '', cantidad: '', horario: ''
   });
 
   useEffect(() => {
@@ -50,7 +60,7 @@ const CaballosDashboard = () => {
 
   const openAddModal = () => {
     setEditingId(null);
-    setFormData({ nombre: '', identificador: '', raza: '', edad: '', sexo: '', peso: '', foto: '' });
+    setFormData({ nombre: '', identificador: '', raza: '', fechaNacimiento: '', sexo: '', peso: '', foto: '' });
     setShowModal(true);
   };
 
@@ -58,7 +68,7 @@ const CaballosDashboard = () => {
     setEditingId(caballo.id);
     setFormData({
       nombre: caballo.nombre || '', identificador: caballo.identificador || '', raza: caballo.raza || '',
-      edad: caballo.edad || '', sexo: caballo.sexo || '', peso: caballo.peso || '', foto: caballo.foto || ''
+      fechaNacimiento: caballo.fechaNacimiento || '', sexo: caballo.sexo || '', peso: caballo.peso || '', foto: caballo.foto || ''
     });
     setShowModal(true);
   };
@@ -90,15 +100,26 @@ const CaballosDashboard = () => {
     }
   };
 
-  // --- HISTORIAL MEDICO LOGIC ---
-  const openHistorialModal = (caballo) => {
+  // --- FICHA VETERINARIA LOGIC ---
+  const openHistorialModal = async (caballo) => {
     setSelectedCaballo(caballo);
-    axios.get(`http://localhost:8080/api/caballos/${caballo.id}/historial`)
-      .then(res => {
-        setHistorial(res.data);
-        setShowHistorialModal(true);
-      })
-      .catch(err => alert('Error al cargar el historial médico'));
+    setActiveTab('medico'); // Reset to default tab
+    try {
+      const [resHistorial, resAlimentacion] = await Promise.all([
+        axios.get(`http://localhost:8080/api/caballos/${caballo.id}/historial`),
+        axios.get('http://localhost:8080/api/plan-alimentacion')
+      ]);
+      
+      setHistorial(resHistorial.data);
+      // Filter feeding plans for this specific horse
+      const filteredPlans = resAlimentacion.data.filter(p => p.caballo && p.caballo.id === caballo.id);
+      setPlanAlimentacion(filteredPlans);
+      
+      setShowHistorialModal(true);
+    } catch (err) {
+      alert('Error al cargar la ficha veterinaria');
+      console.error(err);
+    }
   };
 
   const handleHistorialChange = (e) => {
@@ -113,13 +134,14 @@ const CaballosDashboard = () => {
       tratamiento: historialForm.tratamiento,
       alergias: historialForm.alergias,
       observaciones: historialForm.observaciones,
+      pesoRegistrado: historialForm.pesoRegistrado ? parseFloat(historialForm.pesoRegistrado) : null,
       empleado: { id: historialForm.empleadoId }
     };
 
     axios.post(`http://localhost:8080/api/caballos/${selectedCaballo.id}/historial`, payload)
       .then(res => {
         setHistorial([...historial, res.data]);
-        setHistorialForm({ fecha: '', vacuna: '', tratamiento: '', alergias: '', observaciones: '', empleadoId: '' });
+        setHistorialForm({ fecha: '', vacuna: '', tratamiento: '', alergias: '', observaciones: '', empleadoId: '', pesoRegistrado: '' });
       })
       .catch(err => {
         console.error(err);
@@ -127,11 +149,37 @@ const CaballosDashboard = () => {
       });
   };
 
+  const handleAlimentacionChange = (e) => {
+    setAlimentacionForm({ ...alimentacionForm, [e.target.name]: e.target.value });
+  };
+
+  const handleAlimentacionSubmit = (e) => {
+    e.preventDefault();
+    const payload = {
+      caballo: { id: selectedCaballo.id },
+      descripcion: alimentacionForm.descripcion,
+      cantidad: parseFloat(alimentacionForm.cantidad),
+      horario: alimentacionForm.horario
+    };
+
+    axios.post('http://localhost:8080/api/plan-alimentacion', payload)
+      .then(res => {
+        setPlanAlimentacion([...planAlimentacion, res.data]);
+        setAlimentacionForm({ descripcion: '', cantidad: '', horario: '' });
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Error al añadir plan de alimentación');
+      });
+  };
+
   return (
     <div>
       <div className="page-header">
         <h1>Gestión de Caballos</h1>
-        <button className="btn btn-primary" onClick={openAddModal}>+ Añadir Caballo</button>
+        {rol !== 'CUIDADOR' && (
+          <button className="btn btn-primary" onClick={openAddModal}>+ Añadir Caballo</button>
+        )}
       </div>
 
       <div className="card" style={{ overflowX: 'auto' }}>
@@ -144,9 +192,9 @@ const CaballosDashboard = () => {
                 <th>Nombre</th>
                 <th>Identificador</th>
                 <th>Raza</th>
-                <th>Edad</th>
+                <th>Edad Calculada</th>
                 <th>Sexo</th>
-                <th>Peso</th>
+                <th>Peso Actual</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -173,7 +221,7 @@ const CaballosDashboard = () => {
                     <td style={{ fontWeight: '500' }}>{caballo.nombre}</td>
                     <td>{caballo.identificador}</td>
                     <td>{caballo.raza || '-'}</td>
-                    <td>{caballo.edad ? `${caballo.edad} años` : '-'}</td>
+                    <td>{caballo.fechaNacimiento ? `${new Date().getFullYear() - new Date(caballo.fechaNacimiento).getFullYear()} años` : '-'}</td>
                     <td>{caballo.sexo || '-'}</td>
                     <td>{caballo.peso ? `${caballo.peso} kg` : '-'}</td>
                     <td>
@@ -183,22 +231,26 @@ const CaballosDashboard = () => {
                           style={{ padding: '5px 10px', fontSize: '12px' }}
                           onClick={() => openHistorialModal(caballo)}
                         >
-                          Historial
+                          Ficha Veterinaria
                         </button>
-                        <button 
-                          className="btn btn-primary" 
-                          style={{ padding: '5px 10px', fontSize: '12px', backgroundColor: '#5D737E' }}
-                          onClick={() => openEditModal(caballo)}
-                        >
-                          Editar
-                        </button>
-                        <button 
-                          className="btn" 
-                          style={{ padding: '5px 10px', fontSize: '12px', backgroundColor: '#C94C4C', color: 'white' }}
-                          onClick={() => handleDelete(caballo.id)}
-                        >
-                          Eliminar
-                        </button>
+                        {rol !== 'CUIDADOR' && (
+                          <>
+                            <button 
+                              className="btn btn-primary" 
+                              style={{ padding: '5px 10px', fontSize: '12px', backgroundColor: '#5D737E' }}
+                              onClick={() => openEditModal(caballo)}
+                            >
+                              Editar
+                            </button>
+                            <button 
+                              className="btn" 
+                              style={{ padding: '5px 10px', fontSize: '12px', backgroundColor: '#C94C4C', color: 'white' }}
+                              onClick={() => handleDelete(caballo.id)}
+                            >
+                              Eliminar
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -229,8 +281,8 @@ const CaballosDashboard = () => {
               </div>
               <div style={{ display: 'flex', gap: '15px' }}>
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label>Edad (años)</label>
-                  <input type="number" name="edad" value={formData.edad} onChange={handleChange} />
+                  <label>Fecha de Nacimiento</label>
+                  <input type="date" name="fechaNacimiento" value={formData.fechaNacimiento} onChange={handleChange} />
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
                   <label>Sexo</label>
@@ -258,49 +310,80 @@ const CaballosDashboard = () => {
         </div>
       )}
 
-      {/* MODAL HISTORIAL MEDICO */}
+      {/* MODAL FICHA VETERINARIA */}
       {showHistorialModal && selectedCaballo && (
         <div className="modal-overlay">
-          <div className="modal" style={{ maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto' }}>
-            <h2>Historial Médico de: {selectedCaballo.nombre}</h2>
+          <div className="modal" style={{ maxWidth: '850px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <h2>Ficha Veterinaria: {selectedCaballo.nombre}</h2>
+            <p style={{ marginTop: '-15px', marginBottom: '20px', color: '#666' }}>
+              <strong>Edad actual:</strong> {selectedCaballo.fechaNacimiento ? `${new Date().getFullYear() - new Date(selectedCaballo.fechaNacimiento).getFullYear()} años` : 'Desconocida'} | 
+              <strong> Peso base:</strong> {selectedCaballo.peso ? `${selectedCaballo.peso} kg` : 'Desconocido'}
+            </p>
             
-            <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
-              <h4>Añadir Nuevo Registro Médico</h4>
-              <form onSubmit={handleHistorialSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '10px' }}>
-                <div className="form-group">
-                  <label>Fecha</label>
-                  <input type="date" name="fecha" value={historialForm.fecha} onChange={handleHistorialChange} required />
-                </div>
-                <div className="form-group">
-                  <label>Veterinario / Responsable</label>
-                  <select name="empleadoId" value={historialForm.empleadoId} onChange={handleHistorialChange} required>
-                    <option value="">Seleccione un empleado...</option>
-                    {empleados.map(emp => (
-                      <option key={emp.id} value={emp.id}>{emp.nombre} - {emp.rol}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Vacuna Aplicada</label>
-                  <input type="text" name="vacuna" value={historialForm.vacuna} onChange={handleHistorialChange} />
-                </div>
-                <div className="form-group">
-                  <label>Tratamiento</label>
-                  <input type="text" name="tratamiento" value={historialForm.tratamiento} onChange={handleHistorialChange} />
-                </div>
-                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label>Alergias Conocidas</label>
-                  <input type="text" name="alergias" value={historialForm.alergias} onChange={handleHistorialChange} />
-                </div>
-                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label>Observaciones Adicionales</label>
-                  <textarea name="observaciones" value={historialForm.observaciones} onChange={handleHistorialChange} style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }} rows="3"></textarea>
-                </div>
-                <div className="modal-actions" style={{ gridColumn: '1 / -1', marginTop: '0' }}>
-                  <button type="submit" className="btn btn-primary">Registrar Historial</button>
-                </div>
-              </form>
+            {/* TABS MENU */}
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', borderBottom: '2px solid #eee', paddingBottom: '10px' }}>
+              <button 
+                className={`btn ${activeTab === 'medico' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ borderRadius: '20px', backgroundColor: activeTab !== 'medico' ? 'transparent' : '', color: activeTab !== 'medico' ? 'var(--text)' : '', border: activeTab !== 'medico' ? '1px solid #ccc' : 'none' }}
+                onClick={() => setActiveTab('medico')}
+              >
+                Historial Médico
+              </button>
+              <button 
+                className={`btn ${activeTab === 'alimentacion' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ borderRadius: '20px', backgroundColor: activeTab !== 'alimentacion' ? 'transparent' : '', color: activeTab !== 'alimentacion' ? 'var(--text)' : '', border: activeTab !== 'alimentacion' ? '1px solid #ccc' : 'none' }}
+                onClick={() => setActiveTab('alimentacion')}
+              >
+                Plan de Alimentación
+              </button>
             </div>
+
+            {/* TAB CONTENT: MEDICO */}
+            {activeTab === 'medico' && (
+              <div>
+                {rol !== 'CUIDADOR' && (
+                  <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+                    <h4>Añadir Nuevo Registro Médico</h4>
+                    <form onSubmit={handleHistorialSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '10px' }}>
+                      <div className="form-group">
+                        <label>Fecha</label>
+                        <input type="date" name="fecha" value={historialForm.fecha} onChange={handleHistorialChange} required />
+                      </div>
+                      <div className="form-group">
+                        <label>Veterinario / Responsable</label>
+                        <select name="empleadoId" value={historialForm.empleadoId} onChange={handleHistorialChange} required>
+                          <option value="">Seleccione un empleado...</option>
+                          {empleados.map(emp => (
+                            <option key={emp.id} value={emp.id}>{emp.nombre} - {emp.rol}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label>Vacuna Aplicada</label>
+                        <input type="text" name="vacuna" value={historialForm.vacuna} onChange={handleHistorialChange} />
+                      </div>
+                      <div className="form-group">
+                        <label>Tratamiento</label>
+                        <input type="text" name="tratamiento" value={historialForm.tratamiento} onChange={handleHistorialChange} />
+                      </div>
+                      <div className="form-group">
+                        <label>Peso Registrado (kg) [Opcional]</label>
+                        <input type="number" step="0.01" name="pesoRegistrado" value={historialForm.pesoRegistrado} onChange={handleHistorialChange} />
+                      </div>
+                      <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                        <label>Alergias Conocidas</label>
+                        <input type="text" name="alergias" value={historialForm.alergias} onChange={handleHistorialChange} />
+                      </div>
+                      <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                        <label>Observaciones Adicionales</label>
+                        <textarea name="observaciones" value={historialForm.observaciones} onChange={handleHistorialChange} style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }} rows="3"></textarea>
+                      </div>
+                      <div className="modal-actions" style={{ gridColumn: '1 / -1', marginTop: '0' }}>
+                        <button type="submit" className="btn btn-primary">Registrar Historial</button>
+                      </div>
+                    </form>
+                  </div>
+                )}
 
             <h4>Registros Existentes</h4>
             <div style={{ overflowX: 'auto' }}>
@@ -309,6 +392,7 @@ const CaballosDashboard = () => {
                   <tr>
                     <th>Fecha</th>
                     <th>Responsable</th>
+                    <th>Peso Registrado</th>
                     <th>Vacuna</th>
                     <th>Tratamiento</th>
                     <th>Alergias</th>
@@ -325,6 +409,7 @@ const CaballosDashboard = () => {
                       <tr key={h.id}>
                         <td>{h.fecha}</td>
                         <td>{h.empleado?.nombre}</td>
+                        <td>{h.pesoRegistrado ? `${h.pesoRegistrado} kg` : '-'}</td>
                         <td>{h.vacuna || '-'}</td>
                         <td>{h.tratamiento || '-'}</td>
                         <td>{h.alergias || '-'}</td>
@@ -336,8 +421,67 @@ const CaballosDashboard = () => {
               </table>
             </div>
 
-            <div className="modal-actions" style={{ marginTop: '20px' }}>
-              <button type="button" className="btn" onClick={() => setShowHistorialModal(false)} style={{ backgroundColor: '#ccc', color: '#333' }}>Cerrar</button>
+              </div>
+            )}
+
+            {/* TAB CONTENT: ALIMENTACION */}
+            {activeTab === 'alimentacion' && (
+              <div>
+                {rol !== 'CUIDADOR' && (
+                  <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#fff8f0', borderRadius: '8px', border: '1px solid #fce8d5' }}>
+                    <h4 style={{ color: '#d97706' }}>Asignar Ración de Alimento</h4>
+                    <form onSubmit={handleAlimentacionSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginTop: '10px' }}>
+                      <div className="form-group" style={{ gridColumn: '1 / span 3' }}>
+                        <label>Descripción del Alimento (Ej. Avena, Heno, Suplemento)</label>
+                        <input type="text" name="descripcion" value={alimentacionForm.descripcion} onChange={handleAlimentacionChange} required />
+                      </div>
+                      <div className="form-group">
+                        <label>Cantidad (kg / porciones)</label>
+                        <input type="number" step="0.01" name="cantidad" value={alimentacionForm.cantidad} onChange={handleAlimentacionChange} required />
+                      </div>
+                      <div className="form-group" style={{ gridColumn: '2 / span 2' }}>
+                        <label>Horario (Ej. Mañana, Tarde, 08:00 AM)</label>
+                        <input type="text" name="horario" value={alimentacionForm.horario} onChange={handleAlimentacionChange} required />
+                      </div>
+                      <div className="modal-actions" style={{ gridColumn: '1 / -1', marginTop: '0' }}>
+                        <button type="submit" className="btn btn-primary" style={{ backgroundColor: '#d97706' }}>Registrar Alimento</button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+
+                <h4>Dieta Actual</h4>
+                <div style={{ overflowX: 'auto' }}>
+                  <table className="data-table" style={{ fontSize: '14px' }}>
+                    <thead>
+                      <tr>
+                        <th>Descripción</th>
+                        <th>Cantidad</th>
+                        <th>Horario</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {planAlimentacion.length === 0 ? (
+                        <tr>
+                          <td colSpan="3" style={{ textAlign: 'center' }}>No hay plan de alimentación registrado.</td>
+                        </tr>
+                      ) : (
+                        planAlimentacion.map(p => (
+                          <tr key={p.id}>
+                            <td style={{ fontWeight: '500' }}>{p.descripcion}</td>
+                            <td>{p.cantidad}</td>
+                            <td>{p.horario}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            <div className="modal-actions" style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '15px' }}>
+              <button type="button" className="btn" onClick={() => setShowHistorialModal(false)} style={{ backgroundColor: '#ccc', color: '#333' }}>Cerrar Ficha</button>
             </div>
           </div>
         </div>

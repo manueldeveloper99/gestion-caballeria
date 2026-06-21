@@ -2,9 +2,11 @@ package com.gestioncaballeria.proyecto.service;
 
 import com.gestioncaballeria.proyecto.model.Usuario;
 import com.gestioncaballeria.proyecto.repository.UsuarioRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -13,19 +15,66 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @PostConstruct
+    public void initDefaultUsers() {
+        if (usuarioRepository.count() == 0) {
+            Usuario cliente = new Usuario();
+            cliente.setNombre("Cliente Prueba");
+            cliente.setCorreo("cliente@caballeriza.com");
+            cliente.setPassword("cliente123");
+            cliente.setRol("CLIENTE");
+            usuarioRepository.save(cliente);
+
+            Usuario vet = new Usuario();
+            vet.setNombre("Dr. Veterinario");
+            vet.setCorreo("veterinario@caballeriza.com");
+            vet.setPassword("vet123");
+            vet.setRol("VETERINARIO");
+            usuarioRepository.save(vet);
+
+            Usuario admin = new Usuario();
+            admin.setNombre("Admin Principal");
+            admin.setCorreo("admin@caballeriza.com");
+            admin.setPassword("admin123");
+            admin.setRol("ADMINISTRADOR");
+            usuarioRepository.save(admin);
+        }
+
+        if (usuarioRepository.findByCorreo("cuidador@caballeriza.com").isEmpty()) {
+            Usuario cuidador = new Usuario();
+            cuidador.setNombre("Cuidador Principal");
+            cuidador.setCorreo("cuidador@caballeriza.com");
+            cuidador.setPassword("cuidador123");
+            cuidador.setRol("CUIDADOR");
+            usuarioRepository.save(cuidador);
+        }
+    }
+
     public Usuario registrar(Usuario usuario) {
         return usuarioRepository.save(usuario);
     }
 
     public Optional<Usuario> login(String correo, String password) {
-
         Optional<Usuario> usuario = usuarioRepository.findByCorreo(correo);
-
-        if (usuario.isPresent() &&
-                usuario.get().getPassword().equals(password)) {
+        if (usuario.isPresent() && usuario.get().getPassword().equals(password)) {
             return usuario;
         }
-
         return Optional.empty();
+    }
+
+    public List<Usuario> findAll() {
+        return usuarioRepository.findAll();
+    }
+
+    public Optional<Usuario> findById(Long id) {
+        return usuarioRepository.findById(id);
+    }
+
+    public Usuario save(Usuario usuario) {
+        return usuarioRepository.save(usuario);
+    }
+
+    public void deleteById(Long id) {
+        usuarioRepository.deleteById(id);
     }
 }
