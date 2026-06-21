@@ -16,22 +16,8 @@
 
 
 -- Volcando estructura de base de datos para caballeriza_db
-CREATE DATABASE IF NOT EXISTS `caballeriza_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci */;
+CREATE DATABASE IF NOT EXISTS `caballeriza_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
 USE `caballeriza_db`;
-
--- Volcando estructura para tabla caballeriza_db.alerta
-CREATE TABLE IF NOT EXISTS `alerta` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `inventario_id` bigint(20) NOT NULL,
-  `mensaje` varchar(255) DEFAULT NULL,
-  `fecha` datetime DEFAULT NULL,
-  `tipo` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `inventario_id` (`inventario_id`),
-  CONSTRAINT `1` FOREIGN KEY (`inventario_id`) REFERENCES `inventario` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-
--- Volcando datos para la tabla caballeriza_db.alerta: ~0 rows (aproximadamente)
 
 -- Volcando estructura para tabla caballeriza_db.caballo
 CREATE TABLE IF NOT EXISTS `caballo` (
@@ -45,9 +31,7 @@ CREATE TABLE IF NOT EXISTS `caballo` (
   `foto` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `identificador` (`identificador`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-
--- Volcando datos para la tabla caballeriza_db.caballo: ~0 rows (aproximadamente)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando estructura para tabla caballeriza_db.empleado
 CREATE TABLE IF NOT EXISTS `empleado` (
@@ -56,9 +40,28 @@ CREATE TABLE IF NOT EXISTS `empleado` (
   `rol` enum('VETERINARIO','POTRADOR','CUIDADOR','ADMINISTRADOR') NOT NULL,
   `contacto` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla caballeriza_db.empleado: ~0 rows (aproximadamente)
+-- Volcando estructura para tabla caballeriza_db.inventario
+CREATE TABLE IF NOT EXISTS `inventario` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) NOT NULL,
+  `stock` int(11) NOT NULL,
+  `stockMinimo` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando estructura para tabla caballeriza_db.alerta
+CREATE TABLE IF NOT EXISTS `alerta` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `inventario_id` bigint(20) NOT NULL,
+  `mensaje` varchar(255) DEFAULT NULL,
+  `fecha` datetime DEFAULT NULL,
+  `tipo` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `inventario_id` (`inventario_id`),
+  CONSTRAINT `fk_alerta_inv` FOREIGN KEY (`inventario_id`) REFERENCES `inventario` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando estructura para tabla caballeriza_db.historial_medico
 CREATE TABLE IF NOT EXISTS `historial_medico` (
@@ -73,22 +76,9 @@ CREATE TABLE IF NOT EXISTS `historial_medico` (
   PRIMARY KEY (`id`),
   KEY `caballo_id` (`caballo_id`),
   KEY `empleado_id` (`empleado_id`),
-  CONSTRAINT `1` FOREIGN KEY (`caballo_id`) REFERENCES `caballo` (`id`),
-  CONSTRAINT `2` FOREIGN KEY (`empleado_id`) REFERENCES `empleado` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-
--- Volcando datos para la tabla caballeriza_db.historial_medico: ~0 rows (aproximadamente)
-
--- Volcando estructura para tabla caballeriza_db.inventario
-CREATE TABLE IF NOT EXISTS `inventario` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(100) NOT NULL,
-  `stock` int(11) NOT NULL,
-  `stockMinimo` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-
--- Volcando datos para la tabla caballeriza_db.inventario: ~0 rows (aproximadamente)
+  CONSTRAINT `fk_hm_caballo` FOREIGN KEY (`caballo_id`) REFERENCES `caballo` (`id`),
+  CONSTRAINT `fk_hm_empleado` FOREIGN KEY (`empleado_id`) REFERENCES `empleado` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando estructura para tabla caballeriza_db.plan_alimentacion
 CREATE TABLE IF NOT EXISTS `plan_alimentacion` (
@@ -99,10 +89,58 @@ CREATE TABLE IF NOT EXISTS `plan_alimentacion` (
   `horario` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `caballo_id` (`caballo_id`),
-  CONSTRAINT `1` FOREIGN KEY (`caballo_id`) REFERENCES `caballo` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+  CONSTRAINT `fk_pa_caballo` FOREIGN KEY (`caballo_id`) REFERENCES `caballo` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla caballeriza_db.plan_alimentacion: ~0 rows (aproximadamente)
+-- Volcando estructura para tabla caballeriza_db.suministro
+CREATE TABLE IF NOT EXISTS `suministro` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `caballo_id` bigint(20) NOT NULL,
+  `inventario_id` bigint(20) NOT NULL,
+  `fecha` datetime DEFAULT NULL,
+  `tipo` varchar(100) DEFAULT NULL,
+  `cantidad` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `caballo_id` (`caballo_id`),
+  KEY `inventario_id` (`inventario_id`),
+  CONSTRAINT `fk_sum_caballo` FOREIGN KEY (`caballo_id`) REFERENCES `caballo` (`id`),
+  CONSTRAINT `fk_sum_inv` FOREIGN KEY (`inventario_id`) REFERENCES `inventario` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando estructura para tabla caballeriza_db.tarea
+CREATE TABLE IF NOT EXISTS `tarea` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `empleado_id` bigint(20) NOT NULL,
+  `descripcion` varchar(255) DEFAULT NULL,
+  `estado` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `empleado_id` (`empleado_id`),
+  CONSTRAINT `fk_tar_empleado` FOREIGN KEY (`empleado_id`) REFERENCES `empleado` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando estructura para tabla caballeriza_db.turno
+CREATE TABLE IF NOT EXISTS `turno` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `empleado_id` bigint(20) NOT NULL,
+  `fecha` date NOT NULL,
+  `horario` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `empleado_id` (`empleado_id`),
+  CONSTRAINT `fk_tur_empleado` FOREIGN KEY (`empleado_id`) REFERENCES `empleado` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando estructura para tabla caballeriza_db.usuario
+CREATE TABLE IF NOT EXISTS `usuario` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `empleado_id` bigint(20) DEFAULT NULL,
+  `correo` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `rol` enum('ADMINISTRADOR','VETERINARIO','CUIDADOR','CLIENTE') NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `correo` (`correo`),
+  KEY `empleado_id` (`empleado_id`),
+  CONSTRAINT `fk_usu_empleado` FOREIGN KEY (`empleado_id`) REFERENCES `empleado` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando estructura para tabla caballeriza_db.reserva
 CREATE TABLE IF NOT EXISTS `reserva` (
@@ -118,70 +156,10 @@ CREATE TABLE IF NOT EXISTS `reserva` (
   KEY `usuario_id` (`usuario_id`),
   KEY `caballo_id` (`caballo_id`),
   KEY `empleado_id` (`empleado_id`),
-  CONSTRAINT `1` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`),
-  CONSTRAINT `2` FOREIGN KEY (`caballo_id`) REFERENCES `caballo` (`id`),
-  CONSTRAINT `3` FOREIGN KEY (`empleado_id`) REFERENCES `empleado` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-
--- Volcando datos para la tabla caballeriza_db.reserva: ~0 rows (aproximadamente)
-
--- Volcando estructura para tabla caballeriza_db.suministro
-CREATE TABLE IF NOT EXISTS `suministro` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `caballo_id` bigint(20) NOT NULL,
-  `inventario_id` bigint(20) NOT NULL,
-  `fecha` datetime DEFAULT NULL,
-  `tipo` varchar(100) DEFAULT NULL,
-  `cantidad` decimal(10,2) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `caballo_id` (`caballo_id`),
-  KEY `inventario_id` (`inventario_id`),
-  CONSTRAINT `1` FOREIGN KEY (`caballo_id`) REFERENCES `caballo` (`id`),
-  CONSTRAINT `2` FOREIGN KEY (`inventario_id`) REFERENCES `inventario` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-
--- Volcando datos para la tabla caballeriza_db.suministro: ~0 rows (aproximadamente)
-
--- Volcando estructura para tabla caballeriza_db.tarea
-CREATE TABLE IF NOT EXISTS `tarea` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `empleado_id` bigint(20) NOT NULL,
-  `descripcion` varchar(255) DEFAULT NULL,
-  `estado` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `empleado_id` (`empleado_id`),
-  CONSTRAINT `1` FOREIGN KEY (`empleado_id`) REFERENCES `empleado` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-
--- Volcando datos para la tabla caballeriza_db.tarea: ~0 rows (aproximadamente)
-
--- Volcando estructura para tabla caballeriza_db.turno
-CREATE TABLE IF NOT EXISTS `turno` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `empleado_id` bigint(20) NOT NULL,
-  `fecha` date NOT NULL,
-  `horario` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `empleado_id` (`empleado_id`),
-  CONSTRAINT `1` FOREIGN KEY (`empleado_id`) REFERENCES `empleado` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-
--- Volcando datos para la tabla caballeriza_db.turno: ~0 rows (aproximadamente)
-
--- Volcando estructura para tabla caballeriza_db.usuario
-CREATE TABLE IF NOT EXISTS `usuario` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `empleado_id` bigint(20) DEFAULT NULL,
-  `correo` varchar(100) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `rol` enum('ADMINISTRADOR','VETERINARIO','CUIDADOR','CLIENTE') NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `correo` (`correo`),
-  KEY `empleado_id` (`empleado_id`),
-  CONSTRAINT `1` FOREIGN KEY (`empleado_id`) REFERENCES `empleado` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-
--- Volcando datos para la tabla caballeriza_db.usuario: ~0 rows (aproximadamente)
+  CONSTRAINT `fk_res_usu` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`),
+  CONSTRAINT `fk_res_cab` FOREIGN KEY (`caballo_id`) REFERENCES `caballo` (`id`),
+  CONSTRAINT `fk_res_emp` FOREIGN KEY (`empleado_id`) REFERENCES `empleado` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
