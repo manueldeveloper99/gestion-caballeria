@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import CaballosDashboard from './pages/CaballosDashboard';
 import PersonalDashboard from './pages/PersonalDashboard';
-
+import InventarioDashboard from './pages/InventarioDashboard';
 function App() {
   return (
     <BrowserRouter>
@@ -19,6 +19,7 @@ function App() {
           } />
           <Route path="caballos" element={<CaballosDashboard />} />
           <Route path="personal" element={<PersonalDashboard />} />
+          <Route path="inventario" element={<InventarioDashboard />} />
         </Route>
       </Routes>
     </BrowserRouter>

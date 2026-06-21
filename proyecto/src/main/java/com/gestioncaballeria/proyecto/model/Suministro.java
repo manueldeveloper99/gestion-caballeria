@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "suministro")
 @Data
@@ -14,5 +16,17 @@ public class Suministro {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // TODO: Completar campos (caballo_id, inventario_id, fecha, tipo, cantidad)
+    @ManyToOne
+    @JoinColumn(name = "caballo_id")
+    private Caballo caballo;
+
+    @ManyToOne
+    @JoinColumn(name = "inventario_id")
+    private Inventario inventario;
+
+    private LocalDateTime fecha;
+
+    private String tipo;
+
+    private Double cantidad;
 }

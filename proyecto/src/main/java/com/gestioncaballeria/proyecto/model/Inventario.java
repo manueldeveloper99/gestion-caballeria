@@ -14,5 +14,9 @@ public class Inventario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // TODO: Completar los campos según SQL (nombre, stock, stockMinimo)
+    private String nombre;
+
+    private Integer stock;
+
+    private Integer stockMinimo;
 }

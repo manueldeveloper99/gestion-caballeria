@@ -43,7 +43,7 @@ public class CaballoController {
             caballo.setRaza(caballoDetails.getRaza());
             caballo.setSexo(caballoDetails.getSexo());
             caballo.setPeso(caballoDetails.getPeso());
-            caballo.setFotoUrl(caballoDetails.getFotoUrl());
+            caballo.setFoto(caballoDetails.getFoto());
             return ResponseEntity.ok(caballoService.save(caballo));
         }).orElse(ResponseEntity.notFound().build());
     }
