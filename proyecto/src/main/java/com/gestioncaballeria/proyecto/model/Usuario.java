@@ -14,5 +14,16 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // TODO: Completar campos (empleado_id, correo, password, rol)
+    @ManyToOne
+    @JoinColumn(name = "empleado_id")
+    private Empleado empleado;
+
+    @Column(nullable = false, unique = true)
+    private String correo;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private String rol;
 }
