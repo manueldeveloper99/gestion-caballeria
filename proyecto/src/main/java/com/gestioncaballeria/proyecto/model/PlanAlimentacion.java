@@ -14,5 +14,13 @@ public class PlanAlimentacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // TODO: Completar campos (caballo_id, descripcion, cantidad, horario)
+    @ManyToOne
+    @JoinColumn(name = "caballo_id")
+    private Caballo caballo;
+
+    private String descripcion;
+
+    private Double cantidad;
+
+    private String horario;
 }
