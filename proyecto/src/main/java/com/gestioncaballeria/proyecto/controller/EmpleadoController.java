@@ -71,4 +71,13 @@ public class EmpleadoController {
             return ResponseEntity.notFound().build();
         }
     }
+    @GetMapping("/{id}/turnos")
+    public ResponseEntity<List<Turno>> getTurnos(@PathVariable Long id) {
+        return ResponseEntity.ok(empleadoService.getTurnos(id));
+    }
+
+    @GetMapping("/{id}/tareas")
+    public ResponseEntity<List<Tarea>> getTareas(@PathVariable Long id) {
+        return ResponseEntity.ok(empleadoService.getTareas(id));
+    }
 }

@@ -44,4 +44,7 @@ public class CaballoService {
         }
         throw new RuntimeException("Caballo no encontrado");
     }
+    public List<HistorialMedico> getHistorialMedico(Long caballoId) {
+        return historialMedicoRepository.findByCaballoId(caballoId);
+    }
 }

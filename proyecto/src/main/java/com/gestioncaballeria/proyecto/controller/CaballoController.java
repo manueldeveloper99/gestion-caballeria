@@ -65,4 +65,8 @@ public class CaballoController {
             return ResponseEntity.notFound().build();
         }
     }
+    @GetMapping("/{id}/historial")
+    public ResponseEntity<List<HistorialMedico>> getHistorial(@PathVariable Long id) {
+        return ResponseEntity.ok(caballoService.getHistorialMedico(id));
+    }
 }
