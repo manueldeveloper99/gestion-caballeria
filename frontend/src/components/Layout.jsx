@@ -1,11 +1,29 @@
-import React from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 const Layout = () => {
 
 const location = useLocation();
+const navigate = useNavigate();
 
-const rol = localStorage.getItem('rol');
+const token = localStorage.getItem('token');
+const usuarioRaw = localStorage.getItem('usuario');
+let rol = null;
+
+if (usuarioRaw) {
+  try {
+    const usuario = JSON.parse(usuarioRaw);
+    rol = usuario.rol;
+  } catch (e) {}
+}
+
+useEffect(() => {
+  if (!token) {
+    navigate('/login');
+  }
+}, [token, navigate]);
+
+if (!token) return null;
 
 return ( <div className="app-container">
 

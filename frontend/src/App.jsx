@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-
 import Layout from './components/Layout';
+import './axiosConfig';
 import Login from './pages/Login';
 
 import CaballosDashboard from './pages/CaballosDashboard';

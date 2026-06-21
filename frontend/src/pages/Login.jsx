@@ -26,18 +26,19 @@ try {
 
   if (response.ok) {
 
-    const usuario = await response.json();
+    const data = await response.json();
 
+    localStorage.setItem('token', data.token);
     localStorage.setItem(
       'usuario',
-      JSON.stringify(usuario)
+      JSON.stringify(data.usuario)
     );
 
     alert(
       'Bienvenido ' +
-      usuario.correo +
+      data.usuario.correo +
       ' (' +
-      usuario.rol +
+      data.usuario.rol +
       ')'
     );
 

@@ -3,6 +3,7 @@ package com.gestioncaballeria.proyecto.service;
 import com.gestioncaballeria.proyecto.model.Usuario;
 import com.gestioncaballeria.proyecto.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -13,7 +14,11 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public Usuario registrar(Usuario usuario) {
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         return usuarioRepository.save(usuario);
     }
 
@@ -22,7 +27,7 @@ public class UsuarioService {
         Optional<Usuario> usuario = usuarioRepository.findByCorreo(correo);
 
         if (usuario.isPresent() &&
-                usuario.get().getPassword().equals(password)) {
+                passwordEncoder.matches(password, usuario.get().getPassword())) {
             return usuario;
         }
 
