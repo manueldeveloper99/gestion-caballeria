@@ -23,6 +23,19 @@ public class ReservaService {
     }
 
     public Reserva save(Reserva reserva) {
+        if (reserva.getFechaInicio() != null) {
+            java.time.LocalDateTime minTime = java.time.LocalDateTime.now().plusMinutes(30);
+            if (reserva.getFechaInicio().isBefore(minTime)) {
+                throw new IllegalArgumentException("La reserva debe realizarse con al menos 30 minutos de anticipación.");
+            }
+        }
+        
+        if (reserva.getFechaInicio() != null && reserva.getFechaFin() != null) {
+            if (!reserva.getFechaFin().isAfter(reserva.getFechaInicio())) {
+                throw new IllegalArgumentException("La fecha de fin debe ser posterior a la de inicio.");
+            }
+        }
+
         if (reserva.getEstado() == null || reserva.getEstado().isEmpty()) {
             reserva.setEstado("PENDIENTE");
         }

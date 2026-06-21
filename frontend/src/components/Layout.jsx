@@ -4,21 +4,32 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 const Layout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const rol = localStorage.getItem('rol');
+
+  const token = localStorage.getItem('token');
+  const usuarioRaw = localStorage.getItem('usuario');
+  let rol = null;
+
+  if (usuarioRaw) {
+    try {
+      const usuario = JSON.parse(usuarioRaw);
+      rol = usuario.rol;
+    } catch (e) {}
+  }
 
   useEffect(() => {
-    if (!rol) {
+    if (!token) {
       navigate('/login');
     }
-  }, [rol, navigate]);
+  }, [token, navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('rol');
+    localStorage.removeItem('token');
     localStorage.removeItem('usuario');
+    localStorage.removeItem('rol');
     navigate('/login');
   };
 
-  if (!rol) return null; // Evita renderizar antes del redirect
+  if (!token) return null;
 
   return (
     <div className="app-container">

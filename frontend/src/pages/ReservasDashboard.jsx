@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../axiosConfig';
 
 const ReservasDashboard = () => {
   const [reservas, setReservas] = useState([]);
@@ -81,6 +81,24 @@ const ReservasDashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validaciones de fechas
+    const now = new Date();
+    const fechaInicioDate = new Date(formData.fechaInicio);
+    const fechaFinDate = new Date(formData.fechaFin);
+
+    const minTime = new Date(now.getTime() + 30 * 60000); // 30 minutos desde ahora
+
+    if (fechaInicioDate < minTime) {
+      alert("La reserva debe realizarse con al menos 30 minutos de anticipación y no puede ser en el pasado.");
+      return;
+    }
+
+    if (fechaFinDate <= fechaInicioDate) {
+      alert("La fecha de fin debe ser posterior a la fecha de inicio.");
+      return;
+    }
+
     const payload = {
       usuario: { id: parseInt(formData.usuarioId) },
       caballo: { id: parseInt(formData.caballoId) },

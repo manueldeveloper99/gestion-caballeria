@@ -24,11 +24,12 @@ function Login() {
       });
 
       if (response.ok) {
-        const usuario = await response.json();
+        const data = await response.json();
         
         // Guardamos tanto el objeto completo como el rol para facil acceso
-        localStorage.setItem('usuario', JSON.stringify(usuario));
-        localStorage.setItem('rol', usuario.rol);
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('usuario', JSON.stringify(data.usuario));
+        localStorage.setItem('rol', data.usuario.rol);
 
         // Redirigimos dependiendo del rol o al dashboard principal
         navigate('/');
@@ -92,6 +93,7 @@ function Login() {
       </div>
     </div>
   );
+
 }
 
 export default Login;
