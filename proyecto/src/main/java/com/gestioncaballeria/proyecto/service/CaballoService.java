@@ -35,11 +35,20 @@ public class CaballoService {
         caballoRepository.deleteById(id);
     }
 
+    @Autowired
+    private com.gestioncaballeria.proyecto.repository.EmpleadoRepository empleadoRepository;
+
     public HistorialMedico addHistorialMedico(Long caballoId, HistorialMedico historial) {
         Optional<Caballo> caballoOpt = caballoRepository.findById(caballoId);
         if (caballoOpt.isPresent()) {
             Caballo caballo = caballoOpt.get();
             historial.setCaballo(caballo);
+            
+            if (historial.getEmpleado() != null && historial.getEmpleado().getId() != null) {
+                empleadoRepository.findById(historial.getEmpleado().getId())
+                        .ifPresent(historial::setEmpleado);
+            }
+            
             return historialMedicoRepository.save(historial);
         }
         throw new RuntimeException("Caballo no encontrado");

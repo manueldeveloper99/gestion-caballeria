@@ -26,10 +26,10 @@ public class Reserva {
     @JoinColumn(name = "empleado_id")
     private Empleado empleado;
 
-    @Column(name = "fechaInicio", nullable = false)
+    @Column(name = "`fechaInicio`", nullable = false)
     private java.time.LocalDateTime fechaInicio;
 
-    @Column(name = "fechaFin", nullable = false)
+    @Column(name = "`fechaFin`", nullable = false)
     private java.time.LocalDateTime fechaFin;
 
     @Column(length = 50)

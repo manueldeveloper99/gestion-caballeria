@@ -18,5 +18,6 @@ public class Inventario {
 
     private Integer stock;
 
+    @Column(name = "`stockMinimo`")
     private Integer stockMinimo;
 }

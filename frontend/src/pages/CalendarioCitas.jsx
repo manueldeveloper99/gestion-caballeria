@@ -3,7 +3,7 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import axios from 'axios';
+import axios from '../axiosConfig';
 
 moment.locale('es');
 const localizer = momentLocalizer(moment);
