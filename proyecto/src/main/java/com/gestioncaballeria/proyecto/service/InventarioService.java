@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class InventarioService {
@@ -20,6 +22,10 @@ private AlertaService alertaService;
 
 public List<Inventario> findAll() {
     return inventarioRepository.findAll();
+}
+
+public Page<Inventario> findAllPaginated(Pageable pageable) {
+    return inventarioRepository.findAll(pageable);
 }
 
 public Optional<Inventario> findById(Long id) {

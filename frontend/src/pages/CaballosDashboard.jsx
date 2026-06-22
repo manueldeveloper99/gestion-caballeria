@@ -10,6 +10,8 @@ const formatDate = (dateString) => {
 
 const CaballosDashboard = () => {
   const [caballos, setCaballos] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [empleados, setEmpleados] = useState([]);
   const [inventario, setInventario] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -45,10 +47,13 @@ const CaballosDashboard = () => {
     fetchInventario();
   }, []);
 
-  const fetchCaballos = () => {
-    axios.get('http://localhost:8080/api/caballos')
+  const fetchCaballos = (page = 0) => {
+    setLoading(true);
+    axios.get(`http://localhost:8080/api/caballos/page?page=${page}&size=5`)
       .then(res => {
-        setCaballos(res.data);
+        setCaballos(res.data.content);
+        setTotalPages(res.data.totalPages);
+        setCurrentPage(res.data.number);
         setLoading(false);
       })
       .catch(err => {
@@ -275,6 +280,31 @@ const CaballosDashboard = () => {
               )}
             </tbody>
           </table>
+        )}
+        
+        {/* Pagination Controls */}
+        {!loading && totalPages > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', padding: '15px' }}>
+            <button 
+              className="btn" 
+              style={{ backgroundColor: '#eee', color: '#333' }}
+              disabled={currentPage === 0} 
+              onClick={() => fetchCaballos(currentPage - 1)}
+            >
+              &laquo; Anterior
+            </button>
+            <span style={{ padding: '8px 12px', fontSize: '14px', color: '#555' }}>
+              Página {currentPage + 1} de {totalPages}
+            </span>
+            <button 
+              className="btn" 
+              style={{ backgroundColor: '#eee', color: '#333' }}
+              disabled={currentPage >= totalPages - 1} 
+              onClick={() => fetchCaballos(currentPage + 1)}
+            >
+              Siguiente &raquo;
+            </button>
+          </div>
         )}
       </div>
 

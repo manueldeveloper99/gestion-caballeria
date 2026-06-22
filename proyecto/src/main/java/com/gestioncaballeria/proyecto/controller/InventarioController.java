@@ -7,6 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/inventario")
@@ -19,6 +22,14 @@ public class InventarioController {
     @GetMapping
     public List<Inventario> getAllInventario() {
         return inventarioService.findAll();
+    }
+
+    @GetMapping("/page")
+    public Page<Inventario> getAllInventarioPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return inventarioService.findAllPaginated(pageable);
     }
 
     @GetMapping("/{id}")

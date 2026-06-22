@@ -3,6 +3,8 @@ import axios from '../axiosConfig';
 
 const InventarioDashboard = () => {
   const [inventario, setInventario] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const [showModal, setShowModal] = useState(false);
@@ -18,10 +20,13 @@ const InventarioDashboard = () => {
     fetchInventario();
   }, []);
 
-  const fetchInventario = () => {
-    axios.get('http://localhost:8080/api/inventario')
+  const fetchInventario = (page = 0) => {
+    setLoading(true);
+    axios.get(`http://localhost:8080/api/inventario/page?page=${page}&size=10`)
       .then(res => {
-        setInventario(res.data);
+        setInventario(res.data.content);
+        setTotalPages(res.data.totalPages);
+        setCurrentPage(res.data.number);
         setLoading(false);
       })
       .catch(err => {
@@ -153,6 +158,31 @@ const InventarioDashboard = () => {
               )}
             </tbody>
           </table>
+        )}
+        
+        {/* Pagination Controls */}
+        {!loading && totalPages > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', padding: '15px' }}>
+            <button 
+              className="btn" 
+              style={{ backgroundColor: '#eee', color: '#333' }}
+              disabled={currentPage === 0} 
+              onClick={() => fetchInventario(currentPage - 1)}
+            >
+              &laquo; Anterior
+            </button>
+            <span style={{ padding: '8px 12px', fontSize: '14px', color: '#555' }}>
+              Página {currentPage + 1} de {totalPages}
+            </span>
+            <button 
+              className="btn" 
+              style={{ backgroundColor: '#eee', color: '#333' }}
+              disabled={currentPage >= totalPages - 1} 
+              onClick={() => fetchInventario(currentPage + 1)}
+            >
+              Siguiente &raquo;
+            </button>
+          </div>
         )}
       </div>
 
