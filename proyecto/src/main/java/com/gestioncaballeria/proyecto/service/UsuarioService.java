@@ -6,6 +6,8 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.gestioncaballeria.proyecto.model.Empleado;
+import com.gestioncaballeria.proyecto.repository.EmpleadoRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,12 +21,28 @@ public class UsuarioService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private EmpleadoRepository empleadoRepository;
+
     @PostConstruct
-    public void fixPasswords() {
+    public void fixPasswordsAndLinks() {
         List<Usuario> users = usuarioRepository.findAll();
         for (Usuario u : users) {
+            boolean changed = false;
             if (u.getPassword() != null && !u.getPassword().startsWith("$2a$")) {
                 u.setPassword(passwordEncoder.encode(u.getPassword()));
+                changed = true;
+            }
+            if (u.getEmpleado() == null && !u.getRol().equals("CLIENTE")) {
+                Empleado emp = new Empleado();
+                emp.setNombre(u.getNombre() != null ? u.getNombre() : "Empleado " + u.getRol());
+                emp.setRol(Empleado.RolEmpleado.valueOf(u.getRol()));
+                emp.setContacto(u.getCorreo());
+                empleadoRepository.save(emp);
+                u.setEmpleado(emp);
+                changed = true;
+            }
+            if (changed) {
                 usuarioRepository.save(u);
             }
         }
@@ -45,6 +63,14 @@ public class UsuarioService {
             vet.setCorreo("veterinario@caballeriza.com");
             vet.setPassword(passwordEncoder.encode("vet123"));
             vet.setRol("VETERINARIO");
+            
+            Empleado empVet = new Empleado();
+            empVet.setNombre("Dr. Veterinario");
+            empVet.setRol(Empleado.RolEmpleado.VETERINARIO);
+            empVet.setContacto("veterinario@caballeriza.com");
+            empleadoRepository.save(empVet);
+            vet.setEmpleado(empVet);
+            
             usuarioRepository.save(vet);
 
             Usuario admin = new Usuario();
@@ -52,6 +78,14 @@ public class UsuarioService {
             admin.setCorreo("admin@caballeriza.com");
             admin.setPassword(passwordEncoder.encode("admin123"));
             admin.setRol("ADMINISTRADOR");
+            
+            Empleado empAdmin = new Empleado();
+            empAdmin.setNombre("Admin Principal");
+            empAdmin.setRol(Empleado.RolEmpleado.ADMINISTRADOR);
+            empAdmin.setContacto("admin@caballeriza.com");
+            empleadoRepository.save(empAdmin);
+            admin.setEmpleado(empAdmin);
+            
             usuarioRepository.save(admin);
         }
 
@@ -61,6 +95,14 @@ public class UsuarioService {
             cuidador.setCorreo("cuidador@caballeriza.com");
             cuidador.setPassword(passwordEncoder.encode("cuidador123"));
             cuidador.setRol("CUIDADOR");
+            
+            Empleado empCuidador = new Empleado();
+            empCuidador.setNombre("Cuidador Principal");
+            empCuidador.setRol(Empleado.RolEmpleado.CUIDADOR);
+            empCuidador.setContacto("cuidador@caballeriza.com");
+            empleadoRepository.save(empCuidador);
+            cuidador.setEmpleado(empCuidador);
+            
             usuarioRepository.save(cuidador);
         }
 
