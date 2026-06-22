@@ -17,10 +17,14 @@ const PersonalDashboard = () => {
   const [selectedEmpleado, setSelectedEmpleado] = useState(null);
   
   const [turnos, setTurnos] = useState([]);
-  const [turnoForm, setTurnoForm] = useState({ fecha: '', horario: '' });
+  const [turnoForm, setTurnoForm] = useState({ fecha: '', horaInicio: '', horaFin: '' });
 
   const [tareas, setTareas] = useState([]);
   const [tareaForm, setTareaForm] = useState({ descripcion: '', estado: 'Pendiente' });
+
+  // States for Quick Popover
+  const [hoveredEmpleado, setHoveredEmpleado] = useState(null);
+  const [hoverData, setHoverData] = useState({ tareas: [], turnos: [], loading: false });
 
   useEffect(() => {
     fetchEmpleados();
@@ -106,10 +110,14 @@ const PersonalDashboard = () => {
 
   const handleTurnoSubmit = (e) => {
     e.preventDefault();
-    axios.post(`http://localhost:8080/api/empleados/${selectedEmpleado.id}/turnos`, turnoForm)
+    const payload = {
+      fecha: turnoForm.fecha,
+      horario: `${turnoForm.horaInicio} - ${turnoForm.horaFin}`
+    };
+    axios.post(`http://localhost:8080/api/empleados/${selectedEmpleado.id}/turnos`, payload)
       .then(res => {
         setTurnos([...turnos, res.data]);
-        setTurnoForm({ fecha: '', horario: '' });
+        setTurnoForm({ fecha: '', horaInicio: '', horaFin: '' });
       })
       .catch(err => alert('Error al añadir turno'));
   };
@@ -122,6 +130,25 @@ const PersonalDashboard = () => {
         setTareaForm({ descripcion: '', estado: 'Pendiente' });
       })
       .catch(err => alert('Error al añadir tarea'));
+  };
+
+  const handleMouseEnter = (empleadoId) => {
+    setHoveredEmpleado(empleadoId);
+    setHoverData({ tareas: [], turnos: [], loading: true });
+    
+    Promise.all([
+      axios.get(`http://localhost:8080/api/empleados/${empleadoId}/tareas`),
+      axios.get(`http://localhost:8080/api/empleados/${empleadoId}/turnos`)
+    ]).then(([resTareas, resTurnos]) => {
+      setHoverData({ tareas: resTareas.data, turnos: resTurnos.data, loading: false });
+    }).catch(err => {
+      setHoverData({ tareas: [], turnos: [], loading: false });
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredEmpleado(null);
+    setHoverData({ tareas: [], turnos: [], loading: false });
   };
 
   return (
@@ -161,15 +188,69 @@ const PersonalDashboard = () => {
                       </span>
                     </td>
                     <td>{empleado.contacto || '-'}</td>
-                    <td>
+                    <td style={{ position: 'relative' }}>
                       <div style={{ display: 'flex', gap: '5px' }}>
-                        <button 
-                          className="btn btn-primary" 
-                          style={{ padding: '5px 10px', fontSize: '12px' }}
-                          onClick={() => openTurnosTareasModal(empleado)}
+                        <div 
+                          onMouseEnter={() => handleMouseEnter(empleado.id)}
+                          onMouseLeave={handleMouseLeave}
+                          style={{ position: 'relative' }}
                         >
-                          Turnos y Tareas
-                        </button>
+                          <button 
+                            className="btn btn-primary" 
+                            style={{ padding: '5px 10px', fontSize: '12px' }}
+                            onClick={() => openTurnosTareasModal(empleado)}
+                          >
+                            Turnos y Tareas
+                          </button>
+
+                          {hoveredEmpleado === empleado.id && (
+                            <div style={{
+                              position: 'absolute', top: '100%', left: '0', 
+                              backgroundColor: 'white', border: '1px solid #ddd', 
+                              borderRadius: '6px', padding: '12px', 
+                              boxShadow: '0 5px 15px rgba(0,0,0,0.2)', 
+                              zIndex: 1000, width: '260px',
+                              color: '#333', textAlign: 'left', marginTop: '5px'
+                            }}>
+                              <h5 style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#555', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>
+                                Resumen Rápido
+                              </h5>
+                              {hoverData.loading ? (
+                                <div style={{ fontSize: '12px', color: '#888' }}>Cargando datos...</div>
+                              ) : (
+                                <>
+                                  <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '4px', color: '#8b4513' }}>
+                                    Tareas ({hoverData.tareas.length}):
+                                  </div>
+                                  {hoverData.tareas.length === 0 ? <div style={{ fontSize: '11px', color: '#888', marginBottom: '8px' }}>Sin tareas asignadas.</div> : (
+                                    <ul style={{ padding: '0 0 0 15px', margin: '0 0 10px 0', fontSize: '11px' }}>
+                                      {hoverData.tareas.slice(0,3).map(t => (
+                                        <li key={t.id} style={{ marginBottom: '2px' }}>
+                                          <strong style={{ color: t.estado === 'Completada' ? '#4CAF50' : t.estado === 'En Progreso' ? '#FF9800' : '#F44336' }}>
+                                            [{t.estado}]
+                                          </strong> {t.descripcion}
+                                        </li>
+                                      ))}
+                                      {hoverData.tareas.length > 3 && <li style={{ color: '#888', fontStyle: 'italic' }}>... y {hoverData.tareas.length - 3} más</li>}
+                                    </ul>
+                                  )}
+                                  
+                                  <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '4px', color: '#8b4513' }}>
+                                    Turnos ({hoverData.turnos.length}):
+                                  </div>
+                                  {hoverData.turnos.length === 0 ? <div style={{ fontSize: '11px', color: '#888' }}>Sin turnos asignados.</div> : (
+                                    <ul style={{ padding: '0 0 0 15px', margin: '0 0 0 0', fontSize: '11px' }}>
+                                      {hoverData.turnos.slice(0,2).map(t => (
+                                        <li key={t.id} style={{ marginBottom: '2px' }}>{t.fecha} | {t.horario}</li>
+                                      ))}
+                                      {hoverData.turnos.length > 2 && <li style={{ color: '#888', fontStyle: 'italic' }}>... y {hoverData.turnos.length - 2} más</li>}
+                                    </ul>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </div>
                         <button 
                           className="btn btn-primary" 
                           style={{ padding: '5px 10px', fontSize: '12px', backgroundColor: '#5D737E' }}
@@ -255,11 +336,15 @@ const PersonalDashboard = () => {
                 <form onSubmit={handleTurnoSubmit} style={{ marginTop: '10px' }}>
                   <div className="form-group">
                     <label>Fecha</label>
-                    <input type="date" name="fecha" value={turnoForm.fecha} onChange={handleTurnoChange} required />
+                    <input type="date" name="fecha" value={turnoForm.fecha} onChange={handleTurnoChange} required max="2099-12-31" />
                   </div>
                   <div className="form-group">
-                    <label>Horario (Ej: 08:00 - 16:00)</label>
-                    <input type="text" name="horario" value={turnoForm.horario} onChange={handleTurnoChange} required />
+                    <label>Horario</label>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <input type="time" name="horaInicio" value={turnoForm.horaInicio} onChange={handleTurnoChange} required className="form-control" />
+                      <span style={{ alignSelf: 'center', color: '#555', fontWeight: 'bold' }}>a</span>
+                      <input type="time" name="horaFin" value={turnoForm.horaFin} onChange={handleTurnoChange} required className="form-control" />
+                    </div>
                   </div>
                   <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '8px' }}>Añadir Turno</button>
                 </form>

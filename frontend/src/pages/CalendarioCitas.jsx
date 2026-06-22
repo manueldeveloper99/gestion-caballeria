@@ -51,18 +51,29 @@ const CalendarioCitas = () => {
       const mappedEvents = resReservas.data
         .filter(res => {
           if (isCuidador) {
-             return res.empleado && usuarioActual && usuarioActual.empleado && res.empleado.id === usuarioActual.empleado.id;
+             // Fallback: si por alguna razón el usuarioActual no tiene el empleado vinculado (datos antiguos),
+             // mostramos las citas si el nombre coincide, o si es el único cuidador.
+             const hasLinkedEmpleado = usuarioActual && usuarioActual.empleado;
+             if (hasLinkedEmpleado) {
+               return res.empleado && res.empleado.id === usuarioActual.empleado.id;
+             }
+             // Si no hay vínculo estricto, intenta coincidir por nombre o correo
+             return res.empleado && (
+                res.empleado.nombre === usuarioActual.nombre || 
+                res.empleado.contacto === usuarioActual.correo ||
+                res.empleado.rol === 'CUIDADOR' // fallback extremo: muestra todas las de cuidadores
+             );
           }
           return true;
         })
         .map(res => {
           const isMio = usuarioActual && res.usuario?.id === usuarioActual.id;
-          let title = `${res.tipo} - ${res.caballo?.nombre}`;
+          let title = `[${res.estado}] ${res.tipo} - ${res.caballo?.nombre}`;
           
           if (isCliente && !isMio) {
             title = 'No Disponible';
           } else if (!isCliente) {
-            title = `${res.usuario?.correo} - ${res.caballo?.nombre}`;
+            title = `[${res.estado}] ${res.usuario?.correo} - ${res.caballo?.nombre}`;
           }
 
           return {
@@ -88,7 +99,7 @@ const CalendarioCitas = () => {
       caballoId: caballos[0]?.id || '',
       empleadoId: '',
       fechaInicio: moment(start).format('YYYY-MM-DDTHH:mm'),
-      fechaFin: moment(end).format('YYYY-MM-DDTHH:mm'),
+      fechaFin: moment(start).add(1, 'hours').format('YYYY-MM-DDTHH:mm'),
       tipo: 'Paseo'
     });
     setShowModal(true);
@@ -226,6 +237,7 @@ const CalendarioCitas = () => {
           views={['month']}
           style={{ height: '100%' }}
           selectable={true}
+          popup={true}
           onSelectSlot={handleSelectSlot}
           onSelectEvent={handleSelectEvent}
           eventPropGetter={eventStyleGetter}

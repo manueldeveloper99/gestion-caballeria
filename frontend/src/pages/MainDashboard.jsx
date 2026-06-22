@@ -15,6 +15,11 @@ const MainDashboard = () => {
   const [datosGrafico, setDatosGrafico] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // States for Empleado Tasks
+  const [misTareas, setMisTareas] = useState([]);
+  const [isEmpleado, setIsEmpleado] = useState(false);
+  const [empleadoId, setEmpleadoId] = useState(null);
+
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -78,6 +83,20 @@ const MainDashboard = () => {
       }));
       setDatosGrafico(chartData);
 
+      // Check if current user is an employee and fetch tasks
+      const usuarioRaw = localStorage.getItem('usuario');
+      if (usuarioRaw) {
+        try {
+          const u = JSON.parse(usuarioRaw);
+          if (u.empleado && u.empleado.id) {
+            setIsEmpleado(true);
+            setEmpleadoId(u.empleado.id);
+            const resTareas = await axios.get(`http://localhost:8080/api/empleados/${u.empleado.id}/tareas`);
+            setMisTareas(resTareas.data);
+          }
+        } catch(e) {}
+      }
+
     } catch (err) {
       console.error("Error cargando dashboard:", err);
     } finally {
@@ -95,6 +114,17 @@ const MainDashboard = () => {
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
+  const handleEstadoChange = async (tareaId, nuevoEstado) => {
+    try {
+      await axios.put(`http://localhost:8080/api/empleados/tareas/${tareaId}`, { estado: nuevoEstado });
+      // Update local state
+      setMisTareas(misTareas.map(t => t.id === tareaId ? { ...t, estado: nuevoEstado } : t));
+    } catch (err) {
+      console.error("Error actualizando tarea:", err);
+      alert("Error al actualizar la tarea");
+    }
+  };
+
   if (loading) return <div style={{ padding: '20px', textAlign: 'center' }}>Cargando Panel de Control...</div>;
 
   return (
@@ -102,6 +132,50 @@ const MainDashboard = () => {
       <div className="page-header">
         <h1>Centro de Control</h1>
       </div>
+
+      {isEmpleado && (
+        <div className="card" style={{ marginBottom: '30px', borderLeft: '5px solid #8b4513' }}>
+          <h2 style={{ fontSize: '20px', borderBottom: '1px solid #e5e7eb', paddingBottom: '10px', marginBottom: '15px', color: '#8b4513' }}>
+            Mis Tareas Asignadas
+          </h2>
+          {misTareas.length === 0 ? (
+            <p style={{ color: '#6b7280' }}>No tienes tareas asignadas en este momento.</p>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '15px' }}>
+              {misTareas.map(tarea => (
+                <div key={tarea.id} style={{ 
+                  padding: '15px', 
+                  backgroundColor: tarea.estado === 'Completada' ? '#f0fdf4' : tarea.estado === 'En Progreso' ? '#fffbeb' : '#fff', 
+                  border: '1px solid #e5e7eb', 
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                }}>
+                  <p style={{ margin: '0 0 10px 0', fontSize: '15px', color: '#374151' }}>{tarea.descripcion}</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '12px', color: '#6b7280' }}>Estado actual: <strong>{tarea.estado}</strong></span>
+                    <select 
+                      value={tarea.estado}
+                      onChange={(e) => handleEstadoChange(tarea.id, e.target.value)}
+                      style={{ 
+                        padding: '5px 10px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #ccc',
+                        backgroundColor: 'white',
+                        cursor: 'pointer',
+                        fontSize: '13px'
+                      }}
+                    >
+                      <option value="Pendiente">Pendiente</option>
+                      <option value="En Progreso">En Progreso</option>
+                      <option value="Completada">Completada</option>
+                    </select>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '30px' }}>
         <div className="card" style={{ textAlign: 'center', padding: '20px', borderTop: '4px solid #3b82f6' }}>
