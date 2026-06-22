@@ -25,7 +25,7 @@ public class CaballerizaService {
         if (caballerizaRepository.count() == 0) {
             for (int i = 1; i <= 10; i++) {
                 Caballeriza c = new Caballeriza();
-                c.setNumero("Box " + i);
+                c.setNumero("Caballeriza " + i);
                 c.setEstado("VACIA");
                 caballerizaRepository.save(c);
             }

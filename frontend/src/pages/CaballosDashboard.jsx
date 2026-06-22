@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../axiosConfig';
 
+const formatDate = (dateString) => {
+  if (!dateString) return '-';
+  const onlyDate = dateString.split('T')[0];
+  const [year, month, day] = onlyDate.split('-');
+  return `${day}/${month}/${year}`;
+};
+
 const CaballosDashboard = () => {
   const [caballos, setCaballos] = useState([]);
   const [empleados, setEmpleados] = useState([]);
@@ -20,7 +27,7 @@ const CaballosDashboard = () => {
   const [selectedCaballo, setSelectedCaballo] = useState(null);
   const [historial, setHistorial] = useState([]);
   const [historialForm, setHistorialForm] = useState({
-    fecha: '', vacuna: '', tratamiento: '', alergias: '', observaciones: '', empleadoId: '', pesoRegistrado: ''
+    fecha: '', vacuna: '', tratamiento: '', alergias: '', observaciones: '', empleadoId: '', pesoRegistrado: '', fechaProxima: ''
   });
 
   // State for Tabs inside Ficha Veterinaria
@@ -143,13 +150,14 @@ const CaballosDashboard = () => {
       alergias: historialForm.alergias,
       observaciones: historialForm.observaciones,
       pesoRegistrado: historialForm.pesoRegistrado ? parseFloat(historialForm.pesoRegistrado) : null,
+      fechaProxima: historialForm.fechaProxima,
       empleado: { id: historialForm.empleadoId }
     };
 
     axios.post(`http://localhost:8080/api/caballos/${selectedCaballo.id}/historial`, payload)
       .then(res => {
         setHistorial([...historial, res.data]);
-        setHistorialForm({ fecha: '', vacuna: '', tratamiento: '', alergias: '', observaciones: '', empleadoId: '', pesoRegistrado: '' });
+        setHistorialForm({ fecha: '', vacuna: '', tratamiento: '', alergias: '', observaciones: '', empleadoId: '', pesoRegistrado: '', fechaProxima: '' });
       })
       .catch(err => {
         console.error(err);
@@ -322,7 +330,7 @@ const CaballosDashboard = () => {
       {/* MODAL FICHA VETERINARIA */}
       {showHistorialModal && selectedCaballo && (
         <div className="modal-overlay">
-          <div className="modal" style={{ maxWidth: '850px', maxHeight: '90vh', overflowY: 'auto' }}>
+          <div className="modal" style={{ width: '95%', maxWidth: '1200px', maxHeight: '90vh', overflowY: 'auto' }}>
             <h2>Ficha Veterinaria: {selectedCaballo.nombre}</h2>
             <p style={{ marginTop: '-15px', marginBottom: '20px', color: '#666' }}>
               <strong>Edad actual:</strong> {selectedCaballo.fechaNacimiento ? `${new Date().getFullYear() - new Date(selectedCaballo.fechaNacimiento).getFullYear()} años` : 'Desconocida'} | 
@@ -387,6 +395,10 @@ const CaballosDashboard = () => {
                         <label>Observaciones Adicionales</label>
                         <textarea name="observaciones" value={historialForm.observaciones} onChange={handleHistorialChange} style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }} rows="3"></textarea>
                       </div>
+                      <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                        <label>Fecha Próxima Dosis / Seguimiento (Opcional)</label>
+                        <input type="date" name="fechaProxima" value={historialForm.fechaProxima} onChange={handleHistorialChange} style={{ width: '50%' }} />
+                      </div>
                       <div className="modal-actions" style={{ gridColumn: '1 / -1', marginTop: '0' }}>
                         <button type="submit" className="btn btn-primary">Registrar Historial</button>
                       </div>
@@ -405,23 +417,25 @@ const CaballosDashboard = () => {
                     <th>Vacuna</th>
                     <th>Tratamiento</th>
                     <th>Alergias</th>
+                    <th>Fecha Próx.</th>
                     <th>Observaciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {historial.length === 0 ? (
                     <tr>
-                      <td colSpan="6" style={{ textAlign: 'center' }}>No hay registros médicos para este caballo.</td>
+                      <td colSpan="8" style={{ textAlign: 'center' }}>No hay registros médicos para este caballo.</td>
                     </tr>
                   ) : (
                     historial.map(h => (
                       <tr key={h.id}>
-                        <td>{h.fecha}</td>
+                        <td>{formatDate(h.fecha)}</td>
                         <td>{h.empleado?.nombre}</td>
                         <td>{h.pesoRegistrado ? `${h.pesoRegistrado} kg` : '-'}</td>
                         <td>{h.vacuna || '-'}</td>
                         <td>{h.tratamiento || '-'}</td>
                         <td>{h.alergias || '-'}</td>
+                        <td style={{ color: h.fechaProxima ? '#d97706' : 'inherit', fontWeight: h.fechaProxima ? 'bold' : 'normal' }}>{formatDate(h.fechaProxima)}</td>
                         <td>{h.observaciones || '-'}</td>
                       </tr>
                     ))

@@ -100,8 +100,8 @@ const CaballerizasDashboard = () => {
     <div>
       <div className="page-header">
         <div>
-          <h1>Gestión de Caballerizas (Boxes)</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Panel de visualización y ocupación de boxes del establo.</p>
+          <h1>Gestión de Caballerizas</h1>
+          <p style={{ color: 'var(--text-muted)' }}>Panel de visualización y ocupación de caballerizas del establo.</p>
         </div>
         <div style={{ width: '300px' }}>
           <input 
@@ -128,7 +128,7 @@ const CaballerizasDashboard = () => {
                 className={`box-card ${box.estado.toLowerCase()} ${matchesSearch ? 'highlight-box' : ''}`}
               >
                 <div className="box-header">
-                  <span className="box-number">{box.numero}</span>
+                  <span className="box-number">{box.numero.replace('Box', 'Caballeriza')}</span>
                   <span className={`badge badge-${box.estado.toLowerCase()}`}>
                     {box.estado === 'VACIA' ? 'Disponible' : box.estado}
                   </span>
@@ -196,13 +196,13 @@ const CaballerizasDashboard = () => {
       {showAssignModal && selectedBox && (
         <div className="modal-backdrop">
           <div className="modal-content">
-            <h2 className="modal-title">Asignar Caballo a {selectedBox.numero}</h2>
+            <h2 className="modal-title">Asignar Caballo a {selectedBox.numero.replace('Box', 'Caballeriza')}</h2>
             <form onSubmit={handleAssignSubmit}>
               <div className="form-group">
                 <label>Selecciona un Caballo disponible:</label>
                 {getAvailableHorses().length === 0 ? (
                   <p style={{ color: 'red', fontStyle: 'italic', fontSize: '14px' }}>
-                    No hay caballos registrados que no estén ya asignados a otro box.
+                    No hay caballos registrados que no estén ya asignados a otra caballeriza.
                   </p>
                 ) : (
                   <select 

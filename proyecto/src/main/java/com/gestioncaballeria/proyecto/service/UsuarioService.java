@@ -20,6 +20,17 @@ public class UsuarioService {
     private PasswordEncoder passwordEncoder;
 
     @PostConstruct
+    public void fixPasswords() {
+        List<Usuario> users = usuarioRepository.findAll();
+        for (Usuario u : users) {
+            if (u.getPassword() != null && !u.getPassword().startsWith("$2a$")) {
+                u.setPassword(passwordEncoder.encode(u.getPassword()));
+                usuarioRepository.save(u);
+            }
+        }
+    }
+
+    @PostConstruct
     public void initDefaultUsers() {
         if (usuarioRepository.count() == 0) {
             Usuario cliente = new Usuario();
@@ -51,6 +62,15 @@ public class UsuarioService {
             cuidador.setPassword(passwordEncoder.encode("cuidador123"));
             cuidador.setRol("CUIDADOR");
             usuarioRepository.save(cuidador);
+        }
+
+        if (usuarioRepository.findByCorreo("admin@caballeria.com").isEmpty()) {
+            Usuario admin2 = new Usuario();
+            admin2.setNombre("Admin Secundario");
+            admin2.setCorreo("admin@caballeria.com");
+            admin2.setPassword(passwordEncoder.encode("admin123"));
+            admin2.setRol("ADMINISTRADOR");
+            usuarioRepository.save(admin2);
         }
     }
 
