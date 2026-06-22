@@ -12,6 +12,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import com.gestioncaballeria.proyecto.model.Usuario;
+import com.gestioncaballeria.proyecto.repository.UsuarioRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 @Service
 public class EmpleadoService {
 
@@ -24,6 +28,12 @@ public class EmpleadoService {
     @Autowired
     private TareaRepository tareaRepository;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public List<Empleado> findAll() {
         return empleadoRepository.findAll();
     }
@@ -33,7 +43,22 @@ public class EmpleadoService {
     }
 
     public Empleado save(Empleado empleado) {
-        return empleadoRepository.save(empleado);
+        Empleado savedEmpleado = empleadoRepository.save(empleado);
+
+        if (empleado.getCorreo() != null && !empleado.getCorreo().trim().isEmpty() &&
+            empleado.getPassword() != null && !empleado.getPassword().trim().isEmpty()) {
+            
+            Usuario nuevoUsuario = new Usuario();
+            nuevoUsuario.setNombre(savedEmpleado.getNombre());
+            nuevoUsuario.setCorreo(empleado.getCorreo());
+            nuevoUsuario.setPassword(passwordEncoder.encode(empleado.getPassword()));
+            nuevoUsuario.setRol(savedEmpleado.getRol().name());
+            nuevoUsuario.setEmpleado(savedEmpleado);
+            
+            usuarioRepository.save(nuevoUsuario);
+        }
+
+        return savedEmpleado;
     }
 
     public void deleteById(Long id) {

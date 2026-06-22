@@ -28,7 +28,8 @@ public class SecurityConfig {
             .cors(org.springframework.security.config.Customizer.withDefaults())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/usuarios/login", "/api/usuarios/register").permitAll()
+                .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ERROR).permitAll()
+                .requestMatchers("/api/usuarios/login", "/api/usuarios/register", "/error").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated()
             )

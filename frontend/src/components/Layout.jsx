@@ -27,9 +27,11 @@ const Layout = () => {
   const usuarioRaw = localStorage.getItem('usuario');
   let rol = null;
 
+  let usuario = null;
+
   if (usuarioRaw) {
     try {
-      const usuario = JSON.parse(usuarioRaw);
+      usuario = JSON.parse(usuarioRaw);
       rol = usuario.rol;
     } catch (e) {}
   }
@@ -199,7 +201,7 @@ const Layout = () => {
             </Link>
           )}
 
-          {(rol === 'ADMINISTRADOR') && (
+          {(rol === 'ADMINISTRADOR' || rol === 'CUIDADOR' || rol === 'VETERINARIO') && (
             <Link
               to="/caballerizas"
               className={`nav-link ${location.pathname.includes('/caballerizas') ? 'active' : ''}`}
@@ -225,6 +227,20 @@ const Layout = () => {
       </aside>
 
       <main className="main-content">
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '20px', gap: '15px' }}>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontWeight: '600', color: 'var(--primary)', fontSize: '15px' }}>{usuario?.nombre || 'Usuario'}</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{rol}</div>
+          </div>
+          <div style={{ 
+            width: '45px', height: '45px', borderRadius: '50%', 
+            backgroundColor: 'var(--secondary)', color: 'white', 
+            display: 'flex', justifyContent: 'center', alignItems: 'center', 
+            fontWeight: 'bold', fontSize: '18px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' 
+          }}>
+            {rol ? rol.charAt(0).toUpperCase() : 'U'}
+          </div>
+        </div>
         <Outlet />
       </main>
     </div>

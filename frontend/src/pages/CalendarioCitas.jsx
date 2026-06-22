@@ -21,6 +21,7 @@ const CalendarioCitas = () => {
   const usuarioActual = usuarioActualStr ? JSON.parse(usuarioActualStr) : null;
   const rol = localStorage.getItem('rol') || '';
   const isCliente = rol === 'CLIENTE';
+  const isCuidador = rol === 'CUIDADOR';
 
   const [formData, setFormData] = useState({
     caballoId: '',
@@ -47,26 +48,33 @@ const CalendarioCitas = () => {
       setCaballos(resCaballos.data);
       setEmpleados(resEmpleados.data);
 
-      const mappedEvents = resReservas.data.map(res => {
-        const isMio = usuarioActual && res.usuario?.id === usuarioActual.id;
-        let title = `${res.tipo} - ${res.caballo?.nombre}`;
-        
-        if (isCliente && !isMio) {
-          title = 'No Disponible';
-        } else if (!isCliente) {
-          title = `${res.usuario?.correo} - ${res.caballo?.nombre}`;
-        }
+      const mappedEvents = resReservas.data
+        .filter(res => {
+          if (isCuidador) {
+             return res.empleado && usuarioActual && usuarioActual.empleado && res.empleado.id === usuarioActual.empleado.id;
+          }
+          return true;
+        })
+        .map(res => {
+          const isMio = usuarioActual && res.usuario?.id === usuarioActual.id;
+          let title = `${res.tipo} - ${res.caballo?.nombre}`;
+          
+          if (isCliente && !isMio) {
+            title = 'No Disponible';
+          } else if (!isCliente) {
+            title = `${res.usuario?.correo} - ${res.caballo?.nombre}`;
+          }
 
-        return {
-          id: res.id,
-          title: title,
-          start: new Date(res.fechaInicio),
-          end: new Date(res.fechaFin),
-          reservaOriginal: res,
-          isMio: isMio,
-          estado: res.estado
-        };
-      });
+          return {
+            id: res.id,
+            title: title,
+            start: new Date(res.fechaInicio),
+            end: new Date(res.fechaFin),
+            reservaOriginal: res,
+            isMio: isMio,
+            estado: res.estado
+          };
+        });
       setEventos(mappedEvents);
     } catch (err) {
       console.error("Error cargando datos:", err);
@@ -74,6 +82,7 @@ const CalendarioCitas = () => {
   };
 
   const handleSelectSlot = ({ start, end }) => {
+    if (isCuidador) return;
     setEditingEvent(null);
     setFormData({
       caballoId: caballos[0]?.id || '',
@@ -318,14 +327,16 @@ const CalendarioCitas = () => {
                 <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
                   Cerrar
                 </button>
-                {editingEvent && editingEvent.estado !== 'CANCELADA' && (
+                {!isCuidador && editingEvent && editingEvent.estado !== 'CANCELADA' && (
                    <button type="button" className="btn btn-danger" onClick={handleCancel}>
                      Cancelar Cita
                    </button>
                 )}
-                <button type="submit" className="btn btn-primary">
-                  {editingEvent ? 'Guardar Cambios' : 'Confirmar Paseo'}
-                </button>
+                {!isCuidador && (
+                  <button type="submit" className="btn btn-primary">
+                    {editingEvent ? 'Guardar Cambios' : 'Confirmar Paseo'}
+                  </button>
+                )}
               </div>
             </form>
           </div>

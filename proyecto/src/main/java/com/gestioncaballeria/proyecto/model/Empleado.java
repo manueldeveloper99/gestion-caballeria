@@ -24,6 +24,14 @@ public class Empleado {
     @Column(length = 100)
     private String contacto;
 
+    @Transient
+    @com.fasterxml.jackson.annotation.JsonProperty
+    private String correo;
+
+    @Transient
+    @com.fasterxml.jackson.annotation.JsonProperty
+    private String password;
+
     public enum RolEmpleado {
         VETERINARIO,
         POTRADOR,
