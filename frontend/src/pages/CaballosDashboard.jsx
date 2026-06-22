@@ -186,7 +186,7 @@ const CaballosDashboard = () => {
     <div>
       <div className="page-header">
         <h1>Gestión de Caballos</h1>
-        {rol !== 'CUIDADOR' && (
+        {['ADMINISTRADOR', 'VETERINARIO'].includes(rol?.toUpperCase()) && (
           <button className="btn btn-primary" onClick={openAddModal}>+ Añadir Caballo</button>
         )}
       </div>
@@ -242,7 +242,7 @@ const CaballosDashboard = () => {
                         >
                           Ficha Veterinaria
                         </button>
-                        {rol !== 'CUIDADOR' && (
+                        {['ADMINISTRADOR', 'VETERINARIO'].includes(rol?.toUpperCase()) && (
                           <>
                             <button 
                               className="btn btn-primary" 
@@ -350,7 +350,7 @@ const CaballosDashboard = () => {
             {/* TAB CONTENT: MEDICO */}
             {activeTab === 'medico' && (
               <div>
-                {rol !== 'CUIDADOR' && (
+                {['ADMINISTRADOR', 'VETERINARIO'].includes(rol?.toUpperCase()) && (
                   <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
                     <h4>Añadir Nuevo Registro Médico</h4>
                     <form onSubmit={handleHistorialSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '10px' }}>
@@ -436,7 +436,7 @@ const CaballosDashboard = () => {
             {/* TAB CONTENT: ALIMENTACION */}
             {activeTab === 'alimentacion' && (
               <div>
-                {rol !== 'CUIDADOR' && (
+                {['ADMINISTRADOR', 'VETERINARIO'].includes(rol?.toUpperCase()) && (
                   <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#fff8f0', borderRadius: '8px', border: '1px solid #fce8d5' }}>
                     <h4 style={{ color: '#d97706' }}>Asignar Ración de Alimento</h4>
                     <form onSubmit={handleAlimentacionSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginTop: '10px' }}>
