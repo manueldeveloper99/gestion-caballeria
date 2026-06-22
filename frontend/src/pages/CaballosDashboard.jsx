@@ -11,6 +11,7 @@ const formatDate = (dateString) => {
 const CaballosDashboard = () => {
   const [caballos, setCaballos] = useState([]);
   const [empleados, setEmpleados] = useState([]);
+  const [inventario, setInventario] = useState([]);
   const [loading, setLoading] = useState(true);
   const rol = localStorage.getItem('rol');
   
@@ -35,12 +36,13 @@ const CaballosDashboard = () => {
   // States for Plan Alimentacion
   const [planAlimentacion, setPlanAlimentacion] = useState([]);
   const [alimentacionForm, setAlimentacionForm] = useState({
-    descripcion: '', cantidad: '', horario: ''
+    inventarioId: '', cantidad: '', horario: ''
   });
 
   useEffect(() => {
     fetchCaballos();
     fetchEmpleados();
+    fetchInventario();
   }, []);
 
   const fetchCaballos = () => {
@@ -58,6 +60,12 @@ const CaballosDashboard = () => {
   const fetchEmpleados = () => {
     axios.get('http://localhost:8080/api/empleados')
       .then(res => setEmpleados(res.data))
+      .catch(err => console.error(err));
+  };
+
+  const fetchInventario = () => {
+    axios.get('http://localhost:8080/api/inventario')
+      .then(res => setInventario(res.data))
       .catch(err => console.error(err));
   };
 
@@ -165,7 +173,7 @@ const CaballosDashboard = () => {
     e.preventDefault();
     const payload = {
       caballo: { id: selectedCaballo.id },
-      descripcion: alimentacionForm.descripcion,
+      inventarioId: alimentacionForm.inventarioId,
       cantidad: parseFloat(alimentacionForm.cantidad),
       horario: alimentacionForm.horario
     };
@@ -173,11 +181,12 @@ const CaballosDashboard = () => {
     axios.post('http://localhost:8080/api/plan-alimentacion', payload)
       .then(res => {
         setPlanAlimentacion([...planAlimentacion, res.data]);
-        setAlimentacionForm({ descripcion: '', cantidad: '', horario: '' });
+        setAlimentacionForm({ inventarioId: '', cantidad: '', horario: '' });
       })
       .catch(err => {
         console.error(err);
-        alert('Error al añadir plan de alimentación');
+        const errorMessage = err.response?.data?.message || err.response?.data || 'Error al añadir plan de alimentación';
+        alert("Ocurrió un error: " + (typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage)));
       });
   };
 
@@ -446,8 +455,15 @@ const CaballosDashboard = () => {
                     <h4 style={{ color: '#d97706' }}>Asignar Ración de Alimento</h4>
                     <form onSubmit={handleAlimentacionSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginTop: '10px' }}>
                       <div className="form-group" style={{ gridColumn: '1 / span 3' }}>
-                        <label>Descripción del Alimento (Ej. Avena, Heno, Suplemento)</label>
-                        <input type="text" name="descripcion" value={alimentacionForm.descripcion} onChange={handleAlimentacionChange} required />
+                        <label>Descripción del Alimento (Seleccione del Inventario)</label>
+                        <select name="inventarioId" value={alimentacionForm.inventarioId} onChange={handleAlimentacionChange} required className="form-control">
+                          <option value="">-- Seleccione un Producto --</option>
+                          {inventario.map(item => (
+                            <option key={item.id} value={item.id}>
+                              {item.nombre} (Stock: {item.stock})
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div className="form-group">
                         <label>Cantidad (kg / porciones)</label>

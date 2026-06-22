@@ -31,7 +31,7 @@ const Registro = () => {
         rol: 'CLIENTE' // Default role for public registration
       };
 
-      await axios.post('http://localhost:8080/api/usuarios/registrar', payload);
+      await axios.post('http://localhost:8080/api/usuarios/register', payload);
       alert('¡Cuenta creada con éxito! Ahora puedes iniciar sesión.');
       navigate('/login');
     } catch (err) {

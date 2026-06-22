@@ -10,7 +10,7 @@ import PersonalDashboard from './pages/PersonalDashboard';
 import InventarioDashboard from './pages/InventarioDashboard';
 import CalendarioCitas from './pages/CalendarioCitas';
 import CaballerizasDashboard from './pages/CaballerizasDashboard';
-import Dashboard from './pages/Dashboard';
+import MainDashboard from './pages/MainDashboard';
 function App() {
   return (
     <BrowserRouter>
@@ -20,10 +20,7 @@ function App() {
         <Route path="/registro" element={<Registro />} />
 
         <Route path="/" element={<Layout />}>
-          <Route
-            index
-            element={<Dashboard />}
-          />
+          <Route index element={<MainDashboard />} />
 
           <Route path="caballos" element={<CaballosDashboard />} />
           <Route path="personal" element={<PersonalDashboard />} />

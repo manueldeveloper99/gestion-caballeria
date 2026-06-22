@@ -120,6 +120,23 @@ const CalendarioCitas = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validaciones de fechas
+    const now = new Date();
+    const fechaInicioDate = new Date(formData.fechaInicio);
+    const fechaFinDate = new Date(formData.fechaFin);
+    const minTime = new Date(now.getTime() + 30 * 60000); // 30 minutos desde ahora
+
+    if (fechaInicioDate < minTime) {
+      alert("La reserva debe realizarse con al menos 30 minutos de anticipación y no puede ser en el pasado.");
+      return;
+    }
+
+    if (fechaFinDate <= fechaInicioDate) {
+      alert("La fecha de fin debe ser posterior a la fecha de inicio.");
+      return;
+    }
+
     const payload = {
       usuario: { id: isCliente ? usuarioActual.id : (editingEvent?.reservaOriginal?.usuario?.id || usuarioActual.id) },
       caballo: { id: parseInt(formData.caballoId) },
@@ -140,7 +157,8 @@ const CalendarioCitas = () => {
       fetchData();
     } catch (err) {
       console.error("Error guardando reserva:", err);
-      alert("Ocurrió un error. El caballo podría estar ocupado o los datos son inválidos.");
+      const errorMessage = err.response?.data?.message || err.response?.data || "El caballo podría estar ocupado o los datos son inválidos.";
+      alert("Ocurrió un error: " + (typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage)));
     }
   };
 
