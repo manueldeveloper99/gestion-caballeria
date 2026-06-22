@@ -11,6 +11,9 @@ const InventarioDashboard = () => {
     nombre: '', stock: '', stockMinimo: ''
   });
 
+  const rol = localStorage.getItem('rol') || '';
+  const isCuidador = rol === 'CUIDADOR';
+
   useEffect(() => {
     fetchInventario();
   }, []);
@@ -84,7 +87,9 @@ const InventarioDashboard = () => {
     <div>
       <div className="page-header">
         <h1>Inventario</h1>
-        <button className="btn btn-primary" onClick={openAddModal}>+ Agregar Artículo</button>
+        {!isCuidador && (
+          <button className="btn btn-primary" onClick={openAddModal}>+ Agregar Artículo</button>
+        )}
       </div>
 
       <div className="card" style={{ overflowX: 'auto' }}>
@@ -97,13 +102,13 @@ const InventarioDashboard = () => {
                 <th>Stock Actual</th>
                 <th>Stock Mínimo</th>
                 <th>Estado</th>
-                <th>Acciones</th>
+                {!isCuidador && <th>Acciones</th>}
               </tr>
             </thead>
             <tbody>
               {inventario.length === 0 ? (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: 'center' }}>No hay artículos en el inventario.</td>
+                  <td colSpan={!isCuidador ? "6" : "5"} style={{ textAlign: 'center' }}>No hay artículos en el inventario.</td>
                 </tr>
               ) : (
                 inventario.map(item => (
@@ -123,24 +128,26 @@ const InventarioDashboard = () => {
                         </span>
                       )}
                     </td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '5px' }}>
-                        <button
-                          className="btn btn-primary"
-                          style={{ padding: '5px 10px', fontSize: '12px', backgroundColor: '#5D737E' }}
-                          onClick={() => openEditModal(item)}
-                        >
-                          Editar
-                        </button>
-                        <button
-                          className="btn"
-                          style={{ padding: '5px 10px', fontSize: '12px', backgroundColor: '#C94C4C', color: 'white' }}
-                          onClick={() => handleDelete(item.id)}
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    </td>
+                    {!isCuidador && (
+                      <td>
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                          <button
+                            className="btn btn-primary"
+                            style={{ padding: '5px 10px', fontSize: '12px', backgroundColor: '#5D737E' }}
+                            onClick={() => openEditModal(item)}
+                          >
+                            Editar
+                          </button>
+                          <button
+                            className="btn"
+                            style={{ padding: '5px 10px', fontSize: '12px', backgroundColor: '#C94C4C', color: 'white' }}
+                            onClick={() => handleDelete(item.id)}
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}

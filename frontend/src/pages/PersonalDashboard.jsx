@@ -9,7 +9,7 @@ const PersonalDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
-    nombre: '', rol: 'CUIDADOR', contacto: ''
+    nombre: '', rol: 'CUIDADOR', contacto: '', correo: '', password: ''
   });
 
   // States for Turnos/Tareas Modal
@@ -44,7 +44,7 @@ const PersonalDashboard = () => {
 
   const openAddModal = () => {
     setEditingId(null);
-    setFormData({ nombre: '', rol: 'CUIDADOR', contacto: '' });
+    setFormData({ nombre: '', rol: 'CUIDADOR', contacto: '', correo: '', password: '' });
     setShowModal(true);
   };
 
@@ -217,7 +217,23 @@ const PersonalDashboard = () => {
                 <label>Contacto</label>
                 <input type="text" name="contacto" value={formData.contacto} onChange={handleChange} />
               </div>
-              <div className="modal-actions">
+              
+              {!editingId && (
+                <div style={{ marginTop: '20px', padding: '15px', border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#fdfdfd' }}>
+                  <h4 style={{ margin: '0 0 10px 0', color: '#555' }}>Credenciales de Acceso (Opcional)</h4>
+                  <p style={{ fontSize: '12px', color: '#888', margin: '0 0 10px 0' }}>Si llenas estos campos, se le creará una cuenta de usuario para ingresar al sistema.</p>
+                  <div className="form-group">
+                    <label>Correo Electrónico</label>
+                    <input type="email" name="correo" value={formData.correo || ''} onChange={handleChange} />
+                  </div>
+                  <div className="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" name="password" value={formData.password || ''} onChange={handleChange} />
+                  </div>
+                </div>
+              )}
+
+              <div className="modal-actions" style={{ marginTop: '20px' }}>
                 <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ backgroundColor: '#ccc', color: '#333' }}>Cancelar</button>
                 <button type="submit" className="btn btn-primary">{editingId ? 'Actualizar Empleado' : 'Guardar Empleado'}</button>
               </div>
