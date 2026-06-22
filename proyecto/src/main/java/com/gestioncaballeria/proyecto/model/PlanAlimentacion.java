@@ -23,4 +23,7 @@ public class PlanAlimentacion {
     private Double cantidad;
 
     private String horario;
+
+    @Transient
+    private Long inventarioId;
 }
