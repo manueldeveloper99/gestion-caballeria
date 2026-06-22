@@ -80,4 +80,13 @@ public class EmpleadoController {
     public ResponseEntity<List<Tarea>> getTareas(@PathVariable Long id) {
         return ResponseEntity.ok(empleadoService.getTareas(id));
     }
+
+    @PutMapping("/tareas/{tareaId}")
+    public ResponseEntity<Tarea> updateTarea(@PathVariable Long tareaId, @RequestBody java.util.Map<String, String> payload) {
+        try {
+            return ResponseEntity.ok(empleadoService.updateTareaEstado(tareaId, payload.get("estado")));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

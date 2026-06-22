@@ -63,12 +63,24 @@ const Layout = () => {
       }
       
       const filtered = allAlertas.filter(a => {
-        if (currentRol === 'CLIENTE') {
+        // Si el alerta está asignada específicamente a este usuario, siempre se muestra
+        if (a.usuarioId != null) {
           return a.usuarioId === currentUserId;
-        } else {
-          return a.usuarioId == null || a.usuarioId === currentUserId;
         }
-      });
+
+        // Si el alerta es global (usuarioId es null), se filtra por rol
+        if (currentRol === 'ADMINISTRADOR') {
+          return true; // El administrador ve todo lo global (stock bajo, atenciones)
+        } else if (currentRol === 'VETERINARIO') {
+          // El veterinario solo ve las alertas médicas globales
+          return a.tipo === 'ATENCION_PROXIMA' || a.tipo === 'ATENCION_VENCIDA' || a.tipo === 'VACUNA_PROXIMA';
+        } else {
+          // Cuidador, Potrador o Cliente NO ven alertas globales de stock ni médicas de otros
+          return false;
+        }
+      })
+      .filter(a => !a.leida) // Solo mostrar alertas no leídas
+      .sort((a, b) => b.id - a.id);
       
       setAlertas(filtered);
     } catch (err) {

@@ -89,4 +89,14 @@ public class EmpleadoService {
     public List<Tarea> getTareas(Long empleadoId) {
         return tareaRepository.findByEmpleadoId(empleadoId);
     }
+
+    public Tarea updateTareaEstado(Long tareaId, String estado) {
+        Optional<Tarea> tareaOpt = tareaRepository.findById(tareaId);
+        if (tareaOpt.isPresent()) {
+            Tarea t = tareaOpt.get();
+            t.setEstado(estado);
+            return tareaRepository.save(t);
+        }
+        throw new RuntimeException("Tarea no encontrada");
+    }
 }
