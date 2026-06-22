@@ -39,4 +39,7 @@ public class HistorialMedico {
 
     @Column(columnDefinition = "TEXT")
     private String observaciones;
+
+    @Column(name = "fecha_proxima")
+    private LocalDate fechaProxima;
 }
