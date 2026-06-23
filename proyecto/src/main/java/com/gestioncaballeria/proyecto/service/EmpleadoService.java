@@ -62,6 +62,19 @@ public class EmpleadoService {
     }
 
     public void deleteById(Long id) {
+        List<Turno> turnos = turnoRepository.findByEmpleadoId(id);
+        if (turnos != null && !turnos.isEmpty()) {
+            turnoRepository.deleteAll(turnos);
+        }
+
+        List<Tarea> tareas = tareaRepository.findByEmpleadoId(id);
+        if (tareas != null && !tareas.isEmpty()) {
+            tareaRepository.deleteAll(tareas);
+        }
+
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmpleadoId(id);
+        usuarioOpt.ifPresent(u -> usuarioRepository.delete(u));
+
         empleadoRepository.deleteById(id);
     }
 
