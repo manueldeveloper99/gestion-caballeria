@@ -11,6 +11,8 @@ import InventarioDashboard from './pages/InventarioDashboard';
 import CalendarioCitas from './pages/CalendarioCitas';
 import CaballerizasDashboard from './pages/CaballerizasDashboard';
 import MainDashboard from './pages/MainDashboard';
+import Dashboard from './pages/Dashboard';
+
 function App() {
   return (
     <BrowserRouter>
@@ -27,6 +29,7 @@ function App() {
           <Route path="inventario" element={<InventarioDashboard />} />
           <Route path="reservas" element={<CalendarioCitas />} />
           <Route path="caballerizas" element={<CaballerizasDashboard />} />
+          <Route path="catalogo" element={<Dashboard />} />
         </Route>
 
       </Routes>
