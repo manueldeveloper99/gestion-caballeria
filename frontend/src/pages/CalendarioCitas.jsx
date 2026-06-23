@@ -64,15 +64,17 @@ const CalendarioCitas = () => {
                 res.empleado.rol === 'CUIDADOR' // fallback extremo: muestra todas las de cuidadores
              );
           }
+          const isMio = res.usuario?.id === usuarioActual.id;
+          if (isCliente && !isMio) {
+            return false; // No mostrar las citas de otros a los clientes
+          }
           return true;
         })
         .map(res => {
           const isMio = usuarioActual && res.usuario?.id === usuarioActual.id;
           let title = `[${res.estado}] ${res.tipo} - ${res.caballo?.nombre}`;
           
-          if (isCliente && !isMio) {
-            title = 'No Disponible';
-          } else if (!isCliente) {
+          if (!isCliente) {
             title = `[${res.estado}] ${res.usuario?.correo} - ${res.caballo?.nombre}`;
           }
 

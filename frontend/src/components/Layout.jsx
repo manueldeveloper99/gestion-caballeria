@@ -65,7 +65,7 @@ const Layout = () => {
       const filtered = allAlertas.filter(a => {
         // Si el alerta está asignada específicamente a este usuario, siempre se muestra
         if (a.usuarioId != null) {
-          return a.usuarioId === currentUserId;
+          return a.usuarioId == currentUserId;
         }
 
         // Si el alerta es global (usuarioId es null), se filtra por rol
@@ -181,12 +181,12 @@ const Layout = () => {
           <div style={{ flex: 1 }}>
           <Link
             to="/"
-            className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
+            className={`nav-link ${location.pathname === '/' || location.pathname.includes('/catalogo') ? 'active' : ''}`}
           >
             Dashboard
           </Link>
 
-          {(rol === 'ADMINISTRADOR' || rol === 'VETERINARIO' || rol === 'CUIDADOR') && (
+          {(rol === 'ADMINISTRADOR' || rol === 'VETERINARIO' || rol === 'POTRADOR') && (
             <Link
               to="/caballos"
               className={`nav-link ${location.pathname.includes('/caballos') ? 'active' : ''}`}

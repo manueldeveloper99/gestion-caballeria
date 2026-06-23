@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import axios from '../axiosConfig';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 const MainDashboard = () => {
+  const usuarioRaw = localStorage.getItem('usuario');
+  const usuarioActual = usuarioRaw ? JSON.parse(usuarioRaw) : null;
+  
+  if (usuarioActual?.rol === 'CLIENTE') {
+    return <Navigate to="/catalogo" replace />;
+  }
+
   const [stats, setStats] = useState({
     totalCaballos: 0,
     citasHoy: 0,
