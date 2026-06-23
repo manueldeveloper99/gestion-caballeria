@@ -1,55 +1,115 @@
-# Sistema de Gestión de Caballería - Backend API
+# Sistema de Gestión de Caballeriza
 
-Este repositorio contiene el código fuente del backend para el Sistema de Gestión de Caballería, desarrollado en Spring Boot. El backend proporciona una API RESTful completa para la administración del personal, caballos, caballerizas, inventario y reservas.
+## Descripción
 
-## Requisitos
-- **Java 17+**
-- **Maven**
-- **MySQL** (Base de datos corriendo en `localhost:3306` con base de datos `caballeria_db`)
+Sistema web desarrollado para la administración de una caballeriza. Permite gestionar caballos, personal, inventario, planes de alimentación, suministros, reservas y usuarios.
 
-## Ejecutar el Proyecto
-Puedes ejecutar el backend directamente utilizando el wrapper de Maven:
+## Tecnologías Utilizadas
 
-```bash
+### Backend
+
+* Java 21
+* Spring Boot
+* Spring Data JPA
+* Hibernate
+* MySQL
+* Maven
+
+### Frontend
+
+* React
+* Vite
+* JavaScript
+* CSS
+
+## Funcionalidades
+
+### Gestión de Caballos
+
+* Registro de caballos
+* Consulta y edición de información
+* Historial médico
+
+### Gestión de Personal
+
+* Registro de empleados
+* Asignación de roles
+* Gestión de turnos y tareas
+
+### Alimentación e Inventario
+
+* Planes de alimentación
+* Registro de suministros
+* Control de inventario
+* Alertas de stock bajo
+
+### Seguridad
+
+* Inicio de sesión
+* Roles de usuario
+* Control de acceso según permisos
+
+## Instalación
+
+### Base de Datos
+
+1. Crear una base de datos MySQL llamada:
+
+sql
+caballeriza_db
+
+
+2. Configurar las credenciales en:
+
+properties
+application.properties
+
+
+### Backend
+
+bash
+cd proyecto
 ./mvnw spring-boot:run
+
+
+Servidor disponible en:
+
+text
+http://localhost:8080
+
+
+### Frontend
+
+bash
+cd frontend
+npm install
+npm run dev
+
+
+Aplicación disponible en:
+
+text
+http://localhost:5173
+
+
+## API
+
+La documentación de la API se encuentra disponible mediante Swagger:
+
+```text
+http://localhost:8080/swagger-ui/index.html
 ```
 
-El servidor backend iniciará en `http://localhost:8080`.
+## Integrantes
 
-## Documentación Interactiva (Swagger / OpenAPI)
-La API cuenta con documentación automatizada generada mediante `springdoc-openapi`.
-Una vez que el servidor backend esté ejecutándose, puedes acceder a la interfaz gráfica interactiva en:
+* Manuel
+* Ashly
+* Carolina
 
-👉 **[http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)**
+## Arquitectura
 
-### ¿Cómo probar la API en Swagger (Ejemplo de Autenticación)?
+El proyecto utiliza una arquitectura en capas:
 
-La mayoría de los endpoints están protegidos por seguridad JWT. Para probar los endpoints desde Swagger, sigue estos pasos:
+Controller → Service → Repository → Base de Datos
 
-1. **Obtener un Token:**
-   - Abre la pestaña del controlador `usuario-controller` en Swagger.
-   - Selecciona el endpoint `POST /api/usuarios/login`.
-   - Presiona en **"Try it out"**.
-   - En el `request body`, ingresa las credenciales de un administrador. (Ejemplo por defecto):
-     ```json
-     {
-       "correo": "admin@caballeria.com",
-       "password": "admin"
-     }
-     ```
-   - Presiona **Execute**.
-   - En la respuesta (Response body), copia el valor del `token` generado (sin las comillas).
-
-2. **Autorizar Swagger:**
-   - En la parte superior de la página de Swagger, busca el botón verde **"Authorize"** 🔒.
-   - En el cuadro de texto etiquetado como `BearerAuth (http, Bearer)`, pega el token que copiaste.
-   - Presiona el botón **Authorize** y luego **Close**.
-   
-3. **Ejecutar Consultas Seguras:**
-   - ¡Listo! Ahora el candado de los demás endpoints estará cerrado y podrás enviar peticiones POST, PUT o DELETE como un usuario autenticado.
-
-## Integración Móvil
-Esta API está diseñada para un fácil consumo por aplicaciones móviles:
-- Respuestas estandarizadas en JSON.
-- Manejo de excepciones y errores consistentes (con respuestas HTTP como 400, 401, 403, 404 y 500).
-- Soporte para endpoints paginados usando `Pageable` para optimizar la transferencia de datos masivos (ej. `GET /api/caballos/page?page=0&size=10`).
+y una arquitectura Cliente-Servidor basada en API REST.
