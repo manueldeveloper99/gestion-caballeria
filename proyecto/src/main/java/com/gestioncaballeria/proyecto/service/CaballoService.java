@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class CaballoService {
@@ -21,6 +23,10 @@ public class CaballoService {
 
     public List<Caballo> findAll() {
         return caballoRepository.findAll();
+    }
+
+    public Page<Caballo> findAllPaginated(Pageable pageable) {
+        return caballoRepository.findAll(pageable);
     }
 
     public Optional<Caballo> findById(Long id) {
