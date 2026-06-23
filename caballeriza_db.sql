@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `inventario` (
 -- Volcando estructura para tabla caballeriza_db.alerta
 CREATE TABLE IF NOT EXISTS `alerta` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `inventario_id` bigint(20) NOT NULL,
+  `inventario_id` bigint(20) DEFAULT NULL,
   `mensaje` varchar(255) DEFAULT NULL,
   `fecha` datetime DEFAULT NULL,
   `tipo` varchar(100) DEFAULT NULL,

@@ -22,7 +22,7 @@ const InventarioDashboard = () => {
 
   const fetchInventario = (page = 0) => {
     setLoading(true);
-    axios.get(`http://localhost:8080/api/inventario/page?page=${page}&size=10`)
+    axios.get(`http://localhost:8080/api/inventario/page?page=${page}&size=5`)
       .then(res => {
         setInventario(res.data.content);
         setTotalPages(res.data.totalPages);
@@ -73,7 +73,7 @@ const InventarioDashboard = () => {
     } else {
       axios.post('http://localhost:8080/api/inventario', payload)
         .then(res => {
-          setInventario([...inventario, res.data]);
+          fetchInventario(currentPage);
           setShowModal(false);
         })
         .catch(err => alert('Error al añadir artículo'));
