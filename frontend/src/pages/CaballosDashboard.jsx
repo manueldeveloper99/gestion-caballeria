@@ -113,7 +113,7 @@ const CaballosDashboard = () => {
     } else {
       axios.post('http://localhost:8080/api/caballos', formData)
         .then(res => {
-          setCaballos([...caballos, res.data]);
+          fetchCaballos(currentPage);
           setShowModal(false);
         })
         .catch(err => alert('Error al añadir caballo'));

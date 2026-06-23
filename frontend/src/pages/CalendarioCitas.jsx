@@ -257,7 +257,7 @@ const CalendarioCitas = () => {
       {showModal && (
         <div className="modal-backdrop">
           <div className="modal-content">
-            <h2 className="modal-title">{editingEvent ? 'Detalle de la Cita' : 'Agendar Paseo'}</h2>
+            <h2 className="modal-title">{editingEvent ? 'Detalle de la Cita' : 'Agendar Cita'}</h2>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label>Tipo de Cita:</label>
@@ -346,7 +346,7 @@ const CalendarioCitas = () => {
                 )}
                 {!isCuidador && (
                   <button type="submit" className="btn btn-primary">
-                    {editingEvent ? 'Guardar Cambios' : 'Confirmar Paseo'}
+                    {editingEvent ? 'Guardar Cambios' : 'Confirmar Cita'}
                   </button>
                 )}
               </div>
