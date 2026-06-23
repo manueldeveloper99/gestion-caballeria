@@ -19,6 +19,9 @@ public class PlanAlimentacionService {
     @Autowired
     private InventarioRepository inventarioRepository;
 
+    @Autowired
+    private AlertaService alertaService;
+
     public List<PlanAlimentacion> findAll() {
         return planAlimentacionRepository.findAll();
     }
@@ -40,6 +43,7 @@ public class PlanAlimentacionService {
                 
                 inv.setStock(inv.getStock() - cantidadRestar);
                 inventarioRepository.save(inv);
+                alertaService.verificarStock(inv);
                 planAlimentacion.setDescripcion(inv.getNombre());
             }
         }
